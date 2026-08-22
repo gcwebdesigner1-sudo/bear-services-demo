@@ -8,7 +8,26 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=202608221630">
+<link rel="canonical" href="https://gcwebdesigner1-sudo.github.io/bear-services-demo/">
+<meta name="theme-color" content="#0e1114">
+<meta name="robots" content="index,follow">
+<link rel="preload" as="image" href="assets/res-1.jpg" fetchpriority="high">
+
+<!-- social cards -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bear Services">
+<meta property="og:url" content="https://gcwebdesigner1-sudo.github.io/bear-services-demo/">
+<meta property="og:title" content="Bear Services | 15 &amp; 30 Yard Dumpster Rental — Utah">
+<meta property="og:description" content="Roll-off bins across Utah, billed on the actual weight in your bin — and you get 30 days to fill it, not 14. Call or text (801) 785-4494.">
+<meta property="og:image" content="https://gcwebdesigner1-sudo.github.io/bear-services-demo/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A red Bear Services roll-off bin in a residential driveway">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bear Services | 15 &amp; 30 Yard Dumpster Rental — Utah">
+<meta name="twitter:description" content="Roll-off bins across Utah, billed on actual weight. 30 days to fill your bin. Call or text (801) 785-4494.">
+<meta name="twitter:image" content="https://gcwebdesigner1-sudo.github.io/bear-services-demo/assets/og-image.jpg">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%230e1114'/><circle cx='50' cy='50' r='19' fill='none' stroke='%23d6483f' stroke-width='9'/></svg>">
 </head>
 <body>
@@ -42,18 +61,19 @@
       <a href="#why">Why Bear</a>
       <a href="#services">Services</a>
       <a href="#sizes">Bin sizes</a>
-      <a href="#contacts">Contacts</a>
       <a href="#reviews">Reviews</a>
+      <a href="#faq">FAQ</a>
     </nav>
     <div class="hdr__cta">
-      <a class="btn btn--quiet" href="sms:8017854494">Text us</a>
+      <a class="btn btn--quiet" href="#request">Get a bin</a>
       <a class="btn btn--dark" href="tel:18017854494"><svg class="ic"><use href="#i-phone"/></svg> (801) 785-4494</a>
     </div>
     <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
   </div>
   <div class="mobnav" id="mobnav">
     <a href="#why">Why Bear</a><a href="#services">Services</a><a href="#sizes">Bin sizes</a>
-    <a href="#contacts">Contacts</a><a href="#reviews">Reviews</a><a href="#network">Dunn Companies</a>
+    <a href="#request">Get a bin</a><a href="#contacts">Contacts</a><a href="#reviews">Reviews</a>
+    <a href="#faq">FAQ</a><a href="#network">Dunn Companies</a>
     <a class="mobnav__call" href="tel:18017854494">Call (801) 785-4494</a>
   </div>
 </header>
@@ -234,8 +254,106 @@
   </div>
 </section>
 
+<!-- ══ REQUEST A BIN ══ -->
+<section class="sec sec--soft" id="request">
+  <div class="wrap">
+    <header class="shead reveal">
+      <p class="eyebrow">Get a bin</p>
+      <h2>Tell us the job.<br>We'll size it and drop it.</h2>
+      <p class="lede">Fill this out and it writes the text message for you — you send it from your own phone, and dispatch comes back with availability and what your load will run.</p>
+    </header>
+
+    <div class="req">
+      <form class="req__form reveal" id="binForm" novalidate>
+        <div class="fgrid">
+          <p class="field">
+            <label for="f-name">Your name <span class="req-star" aria-hidden="true">*</span></label>
+            <input id="f-name" name="name" type="text" autocomplete="name" required>
+          </p>
+          <p class="field">
+            <label for="f-phone">Phone <span class="req-star" aria-hidden="true">*</span></label>
+            <input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required>
+          </p>
+        </div>
+
+        <fieldset class="field field--set">
+          <legend>Bin size <span class="req-star" aria-hidden="true">*</span></legend>
+          <div class="seg">
+            <label class="seg__o"><input type="radio" name="size" value="15 yard bin" required><span><b>15 yard</b><i>12,000 lbs</i></span></label>
+            <label class="seg__o"><input type="radio" name="size" value="30 yard bin"><span><b>30 yard</b><i>24,000 lbs</i></span></label>
+            <label class="seg__o"><input type="radio" name="size" value="not sure which size — please advise"><span><b>Not sure</b><i>Size it for me</i></span></label>
+          </div>
+        </fieldset>
+
+        <div class="fgrid">
+          <p class="field">
+            <label for="f-where">Delivery address or city <span class="req-star" aria-hidden="true">*</span></label>
+            <input id="f-where" name="where" type="text" autocomplete="street-address" required>
+          </p>
+          <p class="field">
+            <label for="f-date">Drop-off date <span class="opt">optional</span></label>
+            <input id="f-date" name="date" type="date">
+          </p>
+        </div>
+
+        <p class="field">
+          <label for="f-job">Type of job <span class="opt">optional</span></label>
+          <select id="f-job" name="job">
+            <option value="">Choose one…</option>
+            <option>Residential cleanout or remodel</option>
+            <option>Construction / demo</option>
+            <option>Commercial or ongoing service</option>
+            <option>Landscaping / yard waste</option>
+            <option>Other</option>
+          </select>
+        </p>
+
+        <p class="field">
+          <label for="f-notes">What are you throwing away? <span class="opt">optional</span></label>
+          <textarea id="f-notes" name="notes" rows="3" placeholder="Roughly what's going in the bin — helps us size it and quote the weight."></textarea>
+        </p>
+
+        <p class="ferr" id="formErr" role="alert" hidden></p>
+
+        <button class="btn btn--red btn--big btn--full" type="submit">
+          <svg class="ic"><use href="#i-msg"/></svg> Write my text message
+        </button>
+        <p class="fnote">
+          Nothing is sent from this page and nothing is stored — it opens your own messaging app with the details filled in, and you decide whether to hit send.
+        </p>
+      </form>
+
+      <div class="req__out reveal" id="binOut" hidden>
+        <p class="req__out-hd"><svg class="ic"><use href="#i-msg"/></svg> Your message is ready</p>
+        <pre class="req__msg" id="binMsg"></pre>
+        <div class="req__acts">
+          <a class="btn btn--red btn--big btn--full" id="binSend" href="#"><svg class="ic"><use href="#i-msg"/></svg> Open my text app</a>
+          <button class="btn btn--line btn--full" type="button" id="binCopy">Copy the message</button>
+          <a class="btn btn--line btn--full" href="tel:18017854494"><svg class="ic"><use href="#i-phone"/></svg> Call it in instead</a>
+          <button class="btn btn--quiet btn--full" type="button" id="binBack">← Edit my details</button>
+        </div>
+      </div>
+
+      <aside class="req__side reveal">
+        <h3>What happens next</h3>
+        <ol class="steps">
+          <li><span class="steps__n">1</span><span class="steps__t"><b>You send the text</b>Or call — the same number does both, and it reaches a person, not a phone tree.</span></li>
+          <li><span class="steps__n">2</span><span class="steps__t"><b>Dispatch confirms</b>Serenity comes back with the size that fits your job and when we can have it on site.</span></li>
+          <li><span class="steps__n">3</span><span class="steps__t"><b>Bin drops, clock starts</b>You get 30 days to fill it. Text when it's ready and we pull it.</span></li>
+          <li><span class="steps__n">4</span><span class="steps__t"><b>You're billed on weight</b>We weigh what's actually in the bin. No paying for air on a half-empty load.</span></li>
+        </ol>
+        <a class="req__line" href="tel:18017854494">
+          <i>Rather just call?</i>
+          <b>(801) 785-4494</b>
+          <em>8:00am – 4:00pm, Monday through Friday</em>
+        </a>
+      </aside>
+    </div>
+  </div>
+</section>
+
 <!-- ══ CONTACTS ══ -->
-<section class="sec sec--soft" id="contacts">
+<section class="sec" id="contacts">
   <div class="wrap">
     <header class="shead reveal">
       <p class="eyebrow">Reach a person</p>
@@ -283,7 +401,7 @@
 </section>
 
 <!-- ══ REVIEWS ══ -->
-<section class="sec" id="reviews">
+<section class="sec sec--soft" id="reviews">
   <div class="wrap">
     <header class="shead reveal">
       <p class="eyebrow">Customer reviews</p>
@@ -321,6 +439,52 @@
         <span class="revcta__k">Read them all on Google</span>
         <span class="revcta__d">Or leave your own <svg class="ic"><use href="#i-arr"/></svg></span>
       </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FAQ ══ -->
+<section class="sec" id="faq">
+  <div class="wrap">
+    <header class="shead reveal">
+      <p class="eyebrow">Common questions</p>
+      <h2>The things people ask before they book</h2>
+      <p class="lede">Anything not covered here, call or text (801) 785-4494 — you'll get a straight answer from someone who works here.</p>
+    </header>
+
+    <div class="faq">
+      <details class="fq reveal" open>
+        <summary><span>What does it cost?</span><span class="fq__x" aria-hidden="true"></span></summary>
+        <div class="fq__a"><p>There's a base fee plus the actual weight of what you threw away — and unlike the other guys, we only charge you for the real weight in your bin, not a padded flat rate. Because that depends entirely on your load, we quote it rather than posting a price. Call or text with a rough idea of what's going in and you'll get a number.</p></div>
+      </details>
+      <details class="fq reveal">
+        <summary><span>How long do I get to keep the bin?</span><span class="fq__x" aria-hidden="true"></span></summary>
+        <div class="fq__a"><p>Thirty days. The industry standard is fourteen, after which most companies charge their base fee all over again. Thirty days is enough to finish nearly any project without paying twice — and if you finish early, text us and we'll come pull it.</p></div>
+      </details>
+      <details class="fq reveal">
+        <summary><span>Which size do I need — 15 or 30 yard?</span><span class="fq__x" aria-hidden="true"></span></summary>
+        <div class="fq__a"><p>The 15 yard (12,000 lbs) handles most cleanouts, remodels, small builds and landscaping loads. The 30 yard (24,000 lbs) is double the capacity for full construction jobs, big demos and commercial volume. If you're on the fence, tell us what you're throwing away and we'll size it for you — that call is free and it's cheaper than a second haul.</p></div>
+      </details>
+      <details class="fq reveal">
+        <summary><span>Can I just text instead of calling?</span><span class="fq__x" aria-hidden="true"></span></summary>
+        <div class="fq__a"><p>Yes. One text or call does it all — same number, (801) 785-4494. Ordering a bin, scheduling a pickup or asking a question all work over text, and dispatch (Serenity, (801) 404-1017) and field ops (Bryce, (801) 793-2819) take texts on their direct lines too.</p></div>
+      </details>
+      <details class="fq reveal">
+        <summary><span>How soon can you get a bin to me?</span><span class="fq__x" aria-hidden="true"></span></summary>
+        <div class="fq__a"><p>Depends on what's on the yard that day, so call or text and dispatch will tell you exactly what's open — no guessing games. Quick drop-off and quick pickup are the two things our customers bring up most.</p></div>
+      </details>
+      <details class="fq reveal">
+        <summary><span>Do you do ongoing service, or just one-time?</span><span class="fq__x" aria-hidden="true"></span></summary>
+        <div class="fq__a"><p>Both. Short-term and long-term rentals, one-time use or a standing rotation for warehouses, shops and docks. Set the schedule once and the bin is there when you need it.</p></div>
+      </details>
+      <details class="fq reveal">
+        <summary><span>Where does my load actually end up?</span><span class="fq__x" aria-hidden="true"></span></summary>
+        <div class="fq__a"><p>In our own facilities. Bear is part of Dunn Companies, which also runs the Five Mile Pass sand &amp; rock quarry, the Five Mile Pass C&amp;D landfill and American Fork Concrete Recycling. Owning the back end of the trip is exactly why we can bill you on real weight instead of guesswork.</p></div>
+      </details>
+      <details class="fq reveal">
+        <summary><span>What are your hours?</span><span class="fq__x" aria-hidden="true"></span></summary>
+        <div class="fq__a"><p>8:00am to 4:00pm, Monday through Friday. Texts sent after hours get picked up the next working morning — over 25 years in the waste disposal industry has taught us not to leave people hanging.</p></div>
+      </details>
     </div>
   </div>
 </section>
@@ -387,6 +551,8 @@
       <a href="#services">Commercial</a>
       <a href="#services">Residential</a>
       <a href="#sizes">15 &amp; 30 yard bins</a>
+      <a href="#request">Request a bin</a>
+      <a href="#faq">Common questions</a>
     </div>
     <div class="ftr__col">
       <h4>Contact</h4>
@@ -416,6 +582,178 @@
   <a href="sms:8017854494" class="callbar__t"><svg class="ic"><use href="#i-msg"/></svg> Text</a>
 </div>
 
-<script src="main.js"></script>
+<!-- ══ STRUCTURED DATA ══ -->
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": [
+  "LocalBusiness",
+  "HomeAndConstructionBusiness"
+ ],
+ "@id": "https://gcwebdesigner1-sudo.github.io/bear-services-demo/#business",
+ "name": "Bear Services",
+ "alternateName": "Bear Bins Utah",
+ "description": "Roll-off dumpster rental in Utah. 15 and 30 yard bins for construction, commercial and residential jobs, billed on the actual weight in your bin with 30 days to fill it. Over 25 years in the waste disposal industry.",
+ "url": "https://gcwebdesigner1-sudo.github.io/bear-services-demo/",
+ "telephone": "+1-801-785-4494",
+ "image": "https://gcwebdesigner1-sudo.github.io/bear-services-demo/assets/og-image.jpg",
+ "logo": "https://gcwebdesigner1-sudo.github.io/bear-services-demo/assets/bear-logo.png",
+ "address": {
+  "@type": "PostalAddress",
+  "addressRegion": "UT",
+  "addressCountry": "US"
+ },
+ "areaServed": {
+  "@type": "State",
+  "name": "Utah"
+ },
+ "parentOrganization": {
+  "@type": "Organization",
+  "name": "Dunn Companies"
+ },
+ "openingHoursSpecification": [
+  {
+   "@type": "OpeningHoursSpecification",
+   "dayOfWeek": [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday"
+   ],
+   "opens": "08:00",
+   "closes": "16:00"
+  }
+ ],
+ "contactPoint": [
+  {
+   "@type": "ContactPoint",
+   "contactType": "customer service",
+   "telephone": "+1-801-785-4494",
+   "availableLanguage": "English"
+  },
+  {
+   "@type": "ContactPoint",
+   "contactType": "billing support",
+   "name": "Brad",
+   "telephone": "+1-801-616-5400"
+  },
+  {
+   "@type": "ContactPoint",
+   "contactType": "dispatch",
+   "name": "Serenity",
+   "telephone": "+1-801-404-1017"
+  },
+  {
+   "@type": "ContactPoint",
+   "contactType": "field operations",
+   "name": "Bryce",
+   "telephone": "+1-801-793-2819"
+  }
+ ],
+ "aggregateRating": {
+  "@type": "AggregateRating",
+  "ratingValue": "5.0",
+  "reviewCount": "4",
+  "bestRating": "5"
+ },
+ "hasOfferCatalog": {
+  "@type": "OfferCatalog",
+  "name": "Roll-off bin rental",
+  "itemListElement": [
+   {
+    "@type": "Offer",
+    "itemOffered": {
+     "@type": "Service",
+     "name": "15 yard roll-off bin rental",
+     "description": "12,000 lb capacity roll-off bin for cleanouts, remodels, small builds and landscaping."
+    }
+   },
+   {
+    "@type": "Offer",
+    "itemOffered": {
+     "@type": "Service",
+     "name": "30 yard roll-off bin rental",
+     "description": "24,000 lb capacity roll-off bin for construction, demolition and commercial volume."
+    }
+   }
+  ]
+ }
+}
+</script>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "What does it cost?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "There's a base fee plus the actual weight of what you threw away \u2014 Bear only charges for the real weight in your bin, not a padded flat rate. Because that depends on your load, it's quoted rather than posted. Call or text (801) 785-4494 with a rough idea of what's going in."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "How long do I get to keep the bin?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Thirty days. The industry standard is fourteen, after which most companies charge their base fee again. If you finish early, send a text and Bear will come pull it."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Which size do I need \u2014 15 or 30 yard?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "The 15 yard (12,000 lbs) handles most cleanouts, remodels, small builds and landscaping loads. The 30 yard (24,000 lbs) is double the capacity for full construction jobs, big demos and commercial volume. Call or text and Bear will size it for you."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Can I just text instead of calling?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Yes. One text or call does it all at (801) 785-4494 \u2014 ordering a bin, scheduling a pickup or asking a question all work over text."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "How soon can you get a bin to me?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "It depends on what's available that day, so call or text and dispatch will tell you exactly what's open."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Do you do ongoing service, or just one-time?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Both. Short-term and long-term rentals, one-time use or a standing rotation for warehouses, shops and docks."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Where does my load actually end up?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "In Dunn Companies facilities \u2014 the Five Mile Pass sand & rock quarry, the Five Mile Pass C&D landfill and American Fork Concrete Recycling. Owning the back end of the trip is why Bear can bill on real weight."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "What are your hours?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "8:00am to 4:00pm, Monday through Friday. Texts sent after hours are picked up the next working morning."
+   }
+  }
+ ]
+}
+</script>
+
+<script src="main.js?v=202608221630"></script>
 </body>
 </html>
