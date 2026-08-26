@@ -546,3 +546,7 @@ dd{margin:0}
   .fq summary{padding:17px 18px;font-size:16px;gap:12px}
   .fq__a{padding:0 18px 18px}
 }
+
+/* dimensions span the full spec row under capacity/volume */
+.bin__dims{grid-column:span 2}
+.bin__dims dd{font-size:16px;letter-spacing:-.02em}
