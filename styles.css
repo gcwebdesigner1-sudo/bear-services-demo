@@ -251,13 +251,25 @@ dd{margin:0}
 .bin__art{margin:6px 0 14px;background:var(--soft);border-radius:var(--r);padding:14px 8px}
 .bin--feat .bin__art{background:rgba(255,255,255,.05)}
 .bin__art svg{width:100%;height:auto;display:block}
+/* three faces at different values so depth/width/height read at a glance */
 .bx-face{fill:#d6483f}
-.bx-top{fill:#e8635a}
-.bx-end{fill:#b3352d}
-.bx-fill{stroke:rgba(255,255,255,.4);stroke-width:2;stroke-dasharray:8 7;
-  stroke-linecap:round}
-.bx-foot{stroke:#9aa3ad;stroke-width:5;stroke-linecap:round}
+.bx-end{fill:#a82f28}
+.bx-rim{fill:#e8635a}
+.bx-in{fill:#7d221c}
+.bx-in-b{fill:#611a15}
+.bx-fill{stroke:rgba(255,255,255,.45);stroke-width:2;stroke-dasharray:8 7;
+  stroke-linecap:round;fill:none}
+.bx-foot{stroke:#9aa3ad;stroke-width:5;stroke-linecap:round;fill:none}
 .bin--feat .bx-foot{stroke:#4a545e}
+/* dimension callouts */
+.bx-dim{stroke:var(--slate-l);stroke-width:1.5;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+.bin--feat .bx-dim{stroke:rgba(255,255,255,.42)}
+.bx-lbl{fill:var(--slate);font-family:var(--f);font-size:12px;font-weight:600;
+  letter-spacing:.01em;text-anchor:middle}
+.bin--feat .bx-lbl{fill:rgba(255,255,255,.6)}
+.bx-lbl--h{text-anchor:end}
+.bx-lbl--w{text-anchor:start}
 .bin__tag{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
   color:var(--red)}
 .bin h3{font-size:clamp(28px,3.6vw,36px);margin:5px 0 16px;letter-spacing:-.04em}
@@ -303,6 +315,7 @@ dd{margin:0}
 .mem__hd{display:flex;align-items:center;gap:12px;min-width:0}
 .mem__av{width:40px;height:40px;border-radius:50%;background:var(--red-soft);
   color:var(--red);display:grid;place-items:center;font-weight:800;font-size:16px;flex:none}
+.mem__av .ic{width:19px;height:19px}
 .mem__t{display:flex;flex-direction:column;min-width:0}
 .mem__t i{font-style:normal;font-size:12.5px;font-weight:600;letter-spacing:.07em;
   text-transform:uppercase;color:var(--slate-l)}
@@ -357,8 +370,8 @@ dd{margin:0}
 .revcta__d .ic{width:15px;height:15px}
 
 /* ═══ DUNN NETWORK ═══ */
-.net{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-@media(max-width:860px){.net{grid-template-columns:1fr 1fr}}
+.net{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:760px){.net{grid-template-columns:1fr 1fr}}
 @media(max-width:460px){.net{grid-template-columns:1fr}}
 .net__i{display:block;text-decoration:none;text-align:center;min-width:0;
   background:var(--white);border:1px solid var(--line);border-radius:var(--r);

@@ -1,4 +1,4 @@
-/* Bear Services — demo interactions (zero dependencies) */
+/* Bear Services site interactions (zero dependencies) */
 (function () {
   'use strict';
 
@@ -60,7 +60,7 @@
   function setNav(open) {
     mobnav.classList.toggle('open', open);
     burger.setAttribute('aria-expanded', open ? 'true' : 'false');
-    // collapsed via max-height:0, which leaves the links focusable — hide them
+    // collapsed via max-height:0, which leaves the links focusable, so hide them
     // from the tab order too, or a keyboard user tabs into an invisible menu
     mobnav.setAttribute('aria-hidden', open ? 'false' : 'true');
     [].forEach.call(mobnav.children, function (a) {
@@ -78,7 +78,7 @@
 
   /* ── request-a-bin: composes the text message, sends nothing ──
      No backend on GitHub Pages, and their whole pitch is "one text does it
-     all" — so the form writes the SMS and hands it to the customer's own app.
+     all", so the form writes the SMS and hands it to the customer's own app.
      Desktop browsers largely ignore sms: links, hence the copy fallback. ── */
   var form = document.getElementById('binForm');
   if (form) {
@@ -142,7 +142,7 @@
       errBox.hidden = true;
 
       var lines = [];
-      lines.push('Hi Bear Services — I\'d like to get a bin.');
+      lines.push('Hi Bear Services, I\'d like to get a bin.');
       lines.push('');
       lines.push('Name: ' + name);
       lines.push('Phone: ' + phone);
@@ -166,7 +166,7 @@
 
     copyB.addEventListener('click', function () {
       var done = function () {
-        copyB.textContent = 'Copied — paste it into a text to (801) 785-4494';
+        copyB.textContent = 'Copied. Paste it into a text to (801) 785-4494';
         setTimeout(function () { copyB.textContent = 'Copy the message'; }, 3200);
       };
       if (navigator.clipboard && navigator.clipboard.writeText) {
