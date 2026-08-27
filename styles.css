@@ -250,7 +250,7 @@ dd{margin:0}
   box-shadow:0 6px 16px -6px rgba(214,72,63,.7)}
 .bin__art{margin:6px 0 14px;background:var(--soft);border-radius:var(--r);padding:14px 8px}
 .bin--feat .bin__art{background:rgba(255,255,255,.05)}
-.bin__art svg{width:100%;height:auto;display:block}
+.bin__art svg,.bin__art img{width:100%;height:auto;display:block}
 /* three faces at different values so depth/width/height read at a glance */
 .bx-face{fill:#d6483f}
 .bx-end{fill:#a82f28}
