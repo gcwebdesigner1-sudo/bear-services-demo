@@ -304,7 +304,7 @@ dd{margin:0}
 @media(max-width:520px){.mainline{padding:24px 22px;gap:12px}
   .mainline__go{width:40px;height:40px}}
 
-.people{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.people{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
 @media(max-width:820px){.people{grid-template-columns:1fr}}
 /* stacked, not a single row — long role labels wrapped badly beside the number */
 .mem{display:block;text-decoration:none;min-width:0;
