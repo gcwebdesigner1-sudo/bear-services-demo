@@ -558,15 +558,6 @@ dd{margin:0}
 .svc__more{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-size:14.5px;
   font-weight:600;color:var(--red);text-decoration:none;transition:color .2s,gap .2s}
 .svc__more:hover{color:var(--red-d);gap:9px}
-.cmp{max-width:900px;margin:22px auto 0;overflow-x:auto;background:var(--white);
-  border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh-1)}
-.cmp table{width:100%;border-collapse:collapse;font-size:15px;min-width:600px}
-.cmp th,.cmp td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line-2);vertical-align:top;line-height:1.5}
-.cmp th{font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-l);background:var(--soft)}
-.cmp tbody tr:last-child td{border-bottom:0}
-.cmp td:first-child{font-weight:800;letter-spacing:-.02em;white-space:nowrap}
-.cmp td:nth-child(2),.cmp td:nth-child(3){white-space:nowrap}
-.cmp caption{caption-side:bottom;padding:10px 16px 12px;font-size:13.5px;color:var(--slate-l);text-align:left}
 .addr{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;background:var(--white);
   border:1px solid var(--line);border-radius:var(--r);padding:22px 24px}
 .addr__k{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;letter-spacing:.1em;
