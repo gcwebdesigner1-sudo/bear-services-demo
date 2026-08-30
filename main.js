@@ -6,6 +6,27 @@
   root.classList.remove('no-js');
   root.classList.add('js');
 
+  /* ── analytics: events for Google Tag Manager (window.dataLayer) ──
+     contact_click  {method:'call'|'text', placement, page_path}
+     form_compose   {bin, job}      the request form wrote a message
+     form_open_sms  {bin}           customer opened their text app with it
+     form_copy      {bin}           customer copied the message instead ── */
+  window.dataLayer = window.dataLayer || [];
+  function track(ev, data) {
+    var o = { event: ev, page_path: location.pathname };
+    for (var k in data) { if (Object.prototype.hasOwnProperty.call(data, k)) { o[k] = data[k]; } }
+    window.dataLayer.push(o);
+  }
+  document.addEventListener('click', function (ev) {
+    var a = ev.target.closest && ev.target.closest('a[href^="tel:"],a[href^="sms:"]');
+    if (!a) return;
+    var sec = a.closest('section,header,footer,.callbar,.req__out');
+    track('contact_click', {
+      method: a.getAttribute('href').indexOf('tel:') === 0 ? 'call' : 'text',
+      placement: sec ? (sec.id || sec.className.split(' ')[0]) : 'page'
+    });
+  });
+
   /* ── scroll reveals ── */
   var revealables = document.querySelectorAll('.reveal');
   if ('IntersectionObserver' in window) {
@@ -89,6 +110,7 @@
     var backB  = document.getElementById('binBack');
     var errBox = document.getElementById('formErr');
     var TEL    = '8017854494';
+    var lastSize = '';
 
     function val(n) {
       var el = form.elements[n];
@@ -154,6 +176,8 @@
       var msg = lines.join('\n');
 
       msgBox.textContent = msg;
+      lastSize = size;
+      track('form_compose', { bin: size, job: job || '' });
       // "?&body=" is the form both iOS and Android accept
       sendA.href = 'sms:' + TEL + '?&body=' + encodeURIComponent(msg);
 
@@ -164,7 +188,10 @@
       sendA.focus({ preventScroll: true });
     });
 
+    sendA.addEventListener('click', function () { track('form_open_sms', { bin: lastSize }); });
+
     copyB.addEventListener('click', function () {
+      track('form_copy', { bin: lastSize });
       var done = function () {
         copyB.textContent = 'Copied. Paste it into a text to (801) 785-4494';
         setTimeout(function () { copyB.textContent = 'Copy the message'; }, 3200);

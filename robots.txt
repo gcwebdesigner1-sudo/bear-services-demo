@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://gcwebdesigner1-sudo.github.io/bear-services-demo/sitemap.xml
+Sitemap: https://bearbinsutah.com/sitemap.xml
