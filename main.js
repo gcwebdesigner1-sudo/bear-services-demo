@@ -8,9 +8,10 @@
 
   /* ── analytics: events for Google Tag Manager (window.dataLayer) ──
      contact_click  {method:'call'|'text', placement, page_path}
-     form_compose   {bin, job}      the request form wrote a message
-     form_open_sms  {bin}           customer opened their text app with it
-     form_copy      {bin}           customer copied the message instead ── */
+     gate_business / gate_home      who the bin is for
+     form_submit_business {bin, job, standing, text_ok, offer_ok}
+     form_fallback_sms / form_open_sms / form_copy   the text message fallback
+     optin_submit / account_submit ── */
   window.dataLayer = window.dataLayer || [];
   function track(ev, data) {
     var o = { event: ev, page_path: location.pathname };
@@ -97,24 +98,89 @@
     if (e.key === 'Escape') closeNav();
   });
 
-  /* ── request-a-bin: composes the text message, sends nothing ──
-     No backend on GitHub Pages, and their whole pitch is "one text does it
-     all", so the form writes the SMS and hands it to the customer's own app.
-     Desktop browsers largely ignore sms: links, hence the copy fallback. ── */
+  /* ── lead capture ──────────────────────────────────────────────────────
+     Every form posts JSON to LEAD_ENDPOINT (FormSubmit AJAX) so the request
+     lands in an inbox. Swap the hash for the Bear mailbox once that address is
+     activated. If the post fails (offline, endpoint down), the quote form falls
+     back to composing a text message the customer sends from their own phone.
+     Events: gate_business, gate_home, form_submit_business, form_fallback_sms,
+             optin_submit, account_submit ─────────────────────────────────── */
+  var LEAD_ENDPOINT = 'https://formsubmit.co/ajax/6d11c64cf1c7f0f056ca805e64691e44';
+  var TEL = '8017854494';
+  var OFFER_AMOUNT = '$50';
+  var OFFER_CODE = 'BEAR50';
+
+  function postLead(fields) {
+    if (!window.fetch || !LEAD_ENDPOINT) { return Promise.reject(new Error('no endpoint')); }
+    fields._captcha = 'false';
+    fields._template = 'table';
+    fields.page = location.pathname;
+    return fetch(LEAD_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify(fields)
+    }).then(function (r) {
+      if (!r.ok) { throw new Error('http ' + r.status); }
+      return r.json();
+    }).then(function (j) {
+      if (j && (j.success === 'true' || j.success === true)) { return j; }
+      throw new Error('rejected');
+    });
+  }
+  function validEmail(s) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s); }
+  function flag(el, bad) { if (el) { el.setAttribute('aria-invalid', bad ? 'true' : 'false'); } }
+
+  /* ── the gate: business or home ── */
+  var GATE_KEY = 'bear.gate';
+  var gates = [].slice.call(document.querySelectorAll('[data-gate]'));
+  function setGate(choice, silent) {
+    gates.forEach(function (g) {
+      [].forEach.call(g.querySelectorAll('.gate__o input'), function (r) { r.checked = (r.value === choice); });
+      [].forEach.call(g.querySelectorAll('[data-gate-show]'), function (el) {
+        el.hidden = (el.getAttribute('data-gate-show') !== choice);
+        if (!el.hidden) { el.classList.add('in'); }
+      });
+    });
+    try { sessionStorage.setItem(GATE_KEY, choice); } catch (e) {}
+    if (!silent) { track(choice === 'home' ? 'gate_home' : 'gate_business', {}); }
+  }
+  if (gates.length) {
+    var remembered = null;
+    try { remembered = sessionStorage.getItem(GATE_KEY); } catch (e) {}
+    var preset = gates[0].getAttribute('data-gate-default');
+    if (preset) { setGate(preset, true); }
+    else if (remembered === 'business' || remembered === 'home') { setGate(remembered, true); }
+    else {
+      gates.forEach(function (g) {
+        [].forEach.call(g.querySelectorAll('[data-gate-show]'), function (el) { el.hidden = true; });
+      });
+    }
+    document.addEventListener('change', function (ev) {
+      var r = ev.target;
+      if (r && r.matches && r.matches('.gate__o input') && r.checked) { setGate(r.value, false); }
+    });
+  }
+
+  /* ── quote request ── */
   var form = document.getElementById('binForm');
   if (form) {
     var out    = document.getElementById('binOut');
+    var outHd  = document.getElementById('binOutHd');
     var msgBox = document.getElementById('binMsg');
     var sendA  = document.getElementById('binSend');
     var copyB  = document.getElementById('binCopy');
     var backB  = document.getElementById('binBack');
     var errBox = document.getElementById('formErr');
-    var TEL    = '8017854494';
+    var submitB = document.getElementById('binSubmit');
     var lastSize = '';
 
     function val(n) {
       var el = form.elements[n];
       return el && el.value ? el.value.trim() : '';
+    }
+    function checked(n) {
+      var el = form.elements[n];
+      return !!(el && el.checked);
     }
     function prettyDate(iso) {
       if (!iso) return '';
@@ -122,36 +188,44 @@
       if (p.length !== 3) return iso;
       var d = new Date(+p[0], +p[1] - 1, +p[2]);
       if (isNaN(d)) return iso;
-      return d.toLocaleDateString('en-US',
-        { weekday: 'long', month: 'long', day: 'numeric' });
+      return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
     }
-    function flag(el, bad) {
-      if (!el) return;
-      el.setAttribute('aria-invalid', bad ? 'true' : 'false');
+    function showOut(mode, heading, text) {
+      outHd.textContent = heading;
+      msgBox.textContent = text;
+      sendA.hidden = (mode !== 'sms');
+      copyB.hidden = (mode !== 'sms');
+      form.hidden = true;
+      out.hidden = false;
+      out.classList.add('in');
+      out.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      var name  = val('name'),
-          phone = val('phone'),
-          where = val('where'),
-          size  = form.elements['size'].value,
-          job   = val('job'),
-          date  = val('date'),
-          notes = val('notes');
+      var f = {
+        company: val('company'), name: val('name'), phone: val('phone'), email: val('email'),
+        project: val('project'), where: val('where'), size: form.elements['size'].value,
+        date: val('date'), standing: val('standing'), notes: val('notes')
+      };
 
       var missing = [];
-      if (!name)  { missing.push('your name'); }
-      if (!phone) { missing.push('a phone number'); }
-      if (!size)  { missing.push('a bin size'); }
-      if (!where) { missing.push('where it goes'); }
+      if (!f.company) { missing.push('your company'); }
+      if (!f.name)    { missing.push('your name'); }
+      if (!f.phone)   { missing.push('a phone number'); }
+      if (!validEmail(f.email)) { missing.push('a working email'); }
+      if (!f.project) { missing.push('the type of job'); }
+      if (!f.where)   { missing.push('where the bin goes'); }
+      if (!f.size)    { missing.push('a bin size'); }
 
-      flag(form.elements['name'],  !name);
-      flag(form.elements['phone'], !phone);
-      flag(form.elements['where'], !where);
-      document.querySelector('.field--set')
-        .setAttribute('aria-invalid', size ? 'false' : 'true');
+      flag(form.elements['company'], !f.company);
+      flag(form.elements['name'],    !f.name);
+      flag(form.elements['phone'],   !f.phone);
+      flag(form.elements['email'],   !validEmail(f.email));
+      flag(form.elements['project'], !f.project);
+      flag(form.elements['where'],   !f.where);
+      document.querySelector('.field--set').setAttribute('aria-invalid', f.size ? 'false' : 'true');
 
       if (missing.length) {
         errBox.textContent = 'Still need ' + missing.join(', ') + '.';
@@ -162,30 +236,50 @@
         return;
       }
       errBox.hidden = true;
+      lastSize = f.size;
 
       var lines = [];
-      lines.push('Hi Bear Services, I\'d like to get a bin.');
-      lines.push('');
-      lines.push('Name: ' + name);
-      lines.push('Phone: ' + phone);
-      lines.push('Bin: ' + size);
-      lines.push('Where: ' + where);
-      if (date)  { lines.push('Drop-off: ' + prettyDate(date)); }
-      if (job)   { lines.push('Job: ' + job); }
-      if (notes) { lines.push('Throwing away: ' + notes); }
-      var msg = lines.join('\n');
+      lines.push('Company: ' + f.company);
+      lines.push('Contact: ' + f.name + ', ' + f.phone + ', ' + f.email);
+      lines.push('Job: ' + f.project + (f.standing ? ' (' + f.standing + ')' : ''));
+      lines.push('Bin: ' + f.size);
+      lines.push('Where: ' + f.where);
+      if (f.date)  { lines.push('Start: ' + prettyDate(f.date)); }
+      if (f.notes) { lines.push('Going in: ' + f.notes); }
+      var summary = lines.join('\n');
 
-      msgBox.textContent = msg;
-      lastSize = size;
-      track('form_compose', { bin: size, job: job || '' });
-      // "?&body=" is the form both iOS and Android accept
-      sendA.href = 'sms:' + TEL + '?&body=' + encodeURIComponent(msg);
+      var fields = {
+        _subject: 'Bear quote request: ' + f.company,
+        _replyto: f.email,
+        company: f.company, name: f.name, phone: f.phone, email: f.email, project: f.project,
+        where: f.where, size: f.size, start: f.date, standing: f.standing, notes: f.notes,
+        text_ok: checked('text_ok') ? 'yes' : 'no',
+        offer_ok: checked('offer_ok') ? 'yes' : 'no',
+        consent_wording: 'v1 2026-09-24 quote form',
+        consent_at: new Date().toISOString()
+      };
+      if (checked('offer_ok')) {
+        fields._autoresponse = 'Thanks, dispatch has your request and will text or call you with the price. Your ' +
+          OFFER_AMOUNT + ' off code for the first bin is ' + OFFER_CODE + '. Mention it when dispatch reaches you. ' +
+          'Bear Services, 581 W 1600 N, Orem, Utah. Reply stop to end these emails.';
+      }
 
-      form.hidden = true;
-      out.hidden = false;
-      out.classList.add('in');
-      out.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      sendA.focus({ preventScroll: true });
+      submitB.disabled = true;
+      submitB.textContent = 'Sending…';
+      postLead(fields).then(function () {
+        track('form_submit_business', { bin: f.size, job: f.project, standing: f.standing || '', text_ok: fields.text_ok, offer_ok: fields.offer_ok });
+        showOut('sent', 'Got it. Dispatch has your request.',
+          'Dispatch will text or call ' + f.phone + ' with the price for ' + f.where + ', usually within the hour during the day.\n\n' + summary);
+      }).catch(function () {
+        track('form_fallback_sms', { bin: f.size, job: f.project });
+        var msg = "Hi Bear Services, I'd like a quote on a bin.\n\n" + summary;
+        sendA.href = 'sms:' + TEL + '?&body=' + encodeURIComponent(msg);
+        msgBox.textContent = msg;
+        showOut('sms', 'Your message is ready to send', msg);
+      }).then(function () {
+        submitB.disabled = false;
+        submitB.innerHTML = '<svg class="ic"><use href="#i-arr"/></svg> Get my quote';
+      });
     });
 
     sendA.addEventListener('click', function () { track('form_open_sms', { bin: lastSize }); });
@@ -217,9 +311,62 @@
       out.hidden = true;
       form.hidden = false;
       form.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      form.elements['name'].focus({ preventScroll: true });
+      form.elements['company'].focus({ preventScroll: true });
     });
   }
+
+  /* ── offer opt in + contractor account (small forms, same endpoint) ── */
+  [].forEach.call(document.querySelectorAll('form[data-lead]'), function (f) {
+    var kind = f.getAttribute('data-lead');
+    var okEl = f.querySelector('[data-ok]') || (f.parentElement && f.parentElement.querySelector('[data-ok]'));
+    var errEl = f.querySelector('[data-err]') || (f.parentElement && f.parentElement.querySelector('[data-err]'));
+    f.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var fields = {};
+      [].forEach.call(f.elements, function (el) {
+        if (!el.name || el.disabled) return;
+        if ((el.type === 'checkbox' || el.type === 'radio') && !el.checked) return;
+        fields[el.name] = (el.value || '').trim();
+      });
+      var emailEl = f.querySelector('[name="email"]');
+      if (!validEmail(fields.email || '')) {
+        flag(emailEl, true);
+        if (errEl) { errEl.textContent = 'That email does not look right.'; errEl.hidden = false; }
+        if (emailEl) { emailEl.focus(); }
+        return;
+      }
+      flag(emailEl, false);
+      if (kind === 'account' && !fields.business) {
+        flag(f.querySelector('[name="business"]'), true);
+        if (errEl) { errEl.textContent = 'Still need the business name.'; errEl.hidden = false; }
+        return;
+      }
+      if (errEl) { errEl.hidden = true; }
+      fields._replyto = fields.email;
+      if (kind === 'optin') {
+        fields._subject = 'Bear ' + OFFER_AMOUNT + ' off opt in';
+        fields.consent_wording = 'v1 2026-09-24 offer box';
+        fields._autoresponse = 'Your ' + OFFER_AMOUNT + ' off code for the first bin is ' + OFFER_CODE +
+          '. Mention it when you text or call dispatch at (801) 785-4494 with the address and what is going in the bin. ' +
+          'Bear Services, 581 W 1600 N, Orem, Utah. Reply stop to end these emails.';
+      } else {
+        fields._subject = 'Bear contractor account request: ' + (fields.business || '');
+      }
+      fields.consent_at = new Date().toISOString();
+      var btn = f.querySelector('button[type="submit"]');
+      var label = btn ? btn.textContent : '';
+      if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+      postLead(fields).then(function () {
+        track(kind === 'optin' ? 'optin_submit' : 'account_submit', {});
+        f.hidden = true;
+        if (okEl) { okEl.hidden = false; }
+      }).catch(function () {
+        if (errEl) { errEl.textContent = "Couldn't send. Text (801) 785-4494 and we'll take it from there."; errEl.hidden = false; }
+      }).then(function () {
+        if (btn) { btn.disabled = false; btn.textContent = label; }
+      });
+    });
+  });
 
   /* ── FAQ: one open at a time, and deep links open the right one ── */
   var faqs = [].slice.call(document.querySelectorAll('.faq .fq'));
