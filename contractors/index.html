@@ -204,7 +204,7 @@ End Google Tag Manager (noscript) -->
         </p>
 
         <label class="chk"><input type="checkbox" name="text_ok" value="yes"><span>Text me the quote and updates at this number. Message and data rates may apply. Reply STOP to end.</span></label>
-        <label class="chk"><input type="checkbox" name="offer_ok" value="yes"><span>Email me $50 off my first bin and the occasional contractor offer.</span></label>
+        <label class="chk" hidden><input type="checkbox" name="offer_ok" value="yes"><span>Email me $50 off my first bin and the occasional contractor offer.</span></label>
 
         <p class="ferr" id="formErr" role="alert" hidden></p>
 
@@ -362,7 +362,8 @@ End Google Tag Manager (noscript) -->
 </section>
 
 <!-- ══ OFFER ══ -->
-<section class="sec" id="offer">
+<!-- OFFER: hidden until the owner approves the $50 amount and code. Remove the two hidden attributes (section and checkbox) to turn it on. -->
+<section class="sec" id="offer" hidden>
   <div class="wrap">
     <div class="optin reveal">
       <div>

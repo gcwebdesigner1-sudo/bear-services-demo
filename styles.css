@@ -656,3 +656,5 @@ dd{margin:0}
 /* page head buttons (contractors page) */
 .ph .ctas{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
 .ph .ctas .btn{width:auto}
+
+.chk[hidden],.sec[hidden]{display:none}
