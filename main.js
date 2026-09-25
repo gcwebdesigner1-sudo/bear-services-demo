@@ -9,14 +9,41 @@
   /* ── analytics: events for Google Tag Manager (window.dataLayer) ──
      contact_click  {method:'call'|'text', placement, page_path}
      gate_business / gate_home      who the bin is for
+     form_start                     first focus on the quote form
+     form_error {missing}           submit blocked, which fields were empty
      form_submit_business {bin, job, standing, text_ok, offer_ok}
      form_fallback_sms / form_open_sms / form_copy   the text message fallback
      optin_submit / account_submit ── */
   window.dataLayer = window.dataLayer || [];
+
+  /* ── analytics loaders: set the two ids and both tools turn on. Loaders stay
+     off while an id still contains XXXX. GA4 records every track() event
+     below; Clarity records sessions, heatmaps, rage clicks and drop off. ── */
+  var BEAR_GA4 = 'G-XXXXXXXXXX';
+  var BEAR_CLARITY = 'XXXXXXXXXX';
+  if (BEAR_GA4.indexOf('XXXX') < 0) {
+    var gs = document.createElement('script');
+    gs.async = true;
+    gs.src = 'https://www.googletagmanager.com/gtag/js?id=' + BEAR_GA4;
+    document.head.appendChild(gs);
+    window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+    window.gtag('js', new Date());
+    window.gtag('config', BEAR_GA4);
+  }
+  if (BEAR_CLARITY.indexOf('XXXX') < 0) {
+    window.clarity = window.clarity || function () { (window.clarity.q = window.clarity.q || []).push(arguments); };
+    var cs = document.createElement('script');
+    cs.async = true;
+    cs.src = 'https://www.clarity.ms/tag/' + BEAR_CLARITY;
+    document.head.appendChild(cs);
+  }
+
   function track(ev, data) {
     var o = { event: ev, page_path: location.pathname };
     for (var k in data) { if (Object.prototype.hasOwnProperty.call(data, k)) { o[k] = data[k]; } }
     window.dataLayer.push(o);
+    if (window.gtag && BEAR_GA4.indexOf('XXXX') < 0) { window.gtag('event', ev, o); }
+    if (window.clarity && BEAR_CLARITY.indexOf('XXXX') < 0) { try { window.clarity('event', ev); } catch (e) {} }
   }
   document.addEventListener('click', function (ev) {
     var a = ev.target.closest && ev.target.closest('a[href^="tel:"],a[href^="sms:"]');
@@ -201,6 +228,13 @@
       out.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
+    var started = false;
+    form.addEventListener('focusin', function () {
+      if (started) return;
+      started = true;
+      track('form_start', {});
+    });
+
     form.addEventListener('submit', function (e) {
       e.preventDefault();
 
@@ -228,6 +262,7 @@
       document.querySelector('.field--set').setAttribute('aria-invalid', f.size ? 'false' : 'true');
 
       if (missing.length) {
+        track('form_error', { missing: missing.join('|') });
         errBox.textContent = 'Still need ' + missing.join(', ') + '.';
         errBox.hidden = false;
         var firstBad = form.querySelector('[aria-invalid="true"]');
