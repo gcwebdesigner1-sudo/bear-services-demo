@@ -25,7 +25,7 @@
 <meta property="og:image" content="https://bearbinsutah.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="A red Bear Services roll-off bin in a residential driveway">
+<meta property="og:image:alt" content="A red Bear Services roll off bin on a jobsite">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Contact Bear Services | Call or Text (801) 785-4494 | Orem, UT">
 <meta name="twitter:description" content="Call or text Bear Services at (801) 785-4494 for a 15 or 30 yard dumpster in Orem and Utah County. Yard at 581 W 1600 N, Orem, UT 84057.">
@@ -145,25 +145,72 @@ End Google Tag Manager (noscript) -->
   </div>
 </section>
 
-<!-- ══ REQUEST A BIN ══ -->
-<section class="sec sec--soft" id="request">
+<!-- ══ REQUEST A QUOTE ══ -->
+<section class="sec sec--soft" id="request" data-gate>
   <div class="wrap">
     <header class="shead reveal">
-      <p class="eyebrow">Get a bin</p>
-      <h2>Tell us the job.<br>We'll size it and drop it.</h2>
-      <p class="lede">Fill this out and it writes the text message for you. You send it from your own phone, and dispatch gets back to you with availability and what your load will run.</p>
+      <p class="eyebrow">Get a quote</p>
+      <h2>Tell us the job.<br>Dispatch quotes it.</h2>
+      <p class="lede">For contractors, builders, property managers and businesses. Send the job below and dispatch texts or calls you back with the price for your address. Rather talk? (801) 785-4494 reaches a person.</p>
     </header>
 
+    <fieldset class="gate reveal">
+      <legend>Who is the bin for?</legend>
+      <div class="gate__opts">
+        <label class="gate__o"><input type="radio" name="gate" value="business"><span><svg class="ic"><use href="#i-hammer"/></svg><span class="gate__t"><b>A business, contractor or jobsite</b><i>Builders, roofers, remodelers, property managers</i></span></span></label>
+        <label class="gate__o"><input type="radio" name="gate" value="home"><span><svg class="ic"><use href="#i-home"/></svg><span class="gate__t"><b>My home</b><i>A one time cleanout or home project</i></span></span></label>
+      </div>
+    </fieldset>
+
     <div class="req">
-      <form class="req__form reveal" id="binForm" novalidate>
+      <div class="gate__home reveal" data-gate-show="home">
+        <h3>Right now our bins are booked for contractors and businesses.</h3>
+        <p>We're not taking new home jobs through this form. If it's a small job and you'd still like to ask, call or text dispatch and you'll get an honest answer on whether we can fit you in.</p>
+        <div class="ctas">
+          <a class="btn btn--red" href="tel:18017854494"><svg class="ic"><use href="#i-phone"/></svg> Call (801) 785-4494</a>
+          <a class="btn btn--line" href="sms:8017854494"><svg class="ic"><use href="#i-msg"/></svg> Text the same number</a>
+        </div>
+      </div>
+
+      <form class="req__form reveal" id="binForm" novalidate data-gate-show="business" data-clarity-mask="true">
         <div class="fgrid">
+          <p class="field">
+            <label for="f-company">Company <span class="req-star" aria-hidden="true">*</span></label>
+            <input id="f-company" name="company" type="text" autocomplete="organization" required>
+          </p>
           <p class="field">
             <label for="f-name">Your name <span class="req-star" aria-hidden="true">*</span></label>
             <input id="f-name" name="name" type="text" autocomplete="name" required>
           </p>
+        </div>
+        <div class="fgrid">
           <p class="field">
             <label for="f-phone">Phone <span class="req-star" aria-hidden="true">*</span></label>
             <input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required>
+          </p>
+          <p class="field">
+            <label for="f-email">Email <span class="req-star" aria-hidden="true">*</span></label>
+            <input id="f-email" name="email" type="email" autocomplete="email" required>
+          </p>
+        </div>
+        <div class="fgrid">
+          <p class="field">
+            <label for="f-project">Type of job <span class="req-star" aria-hidden="true">*</span></label>
+            <select id="f-project" name="project" required>
+              <option value="">Choose one…</option>
+              <option>New build</option>
+              <option>Remodel or tenant improvement</option>
+              <option>Roofing tear off</option>
+              <option>Demolition</option>
+              <option>Landscaping or excavation</option>
+              <option>Standing commercial rotation</option>
+              <option>Property turnover or cleanout</option>
+              <option>Other business job</option>
+            </select>
+          </p>
+          <p class="field">
+            <label for="f-where">Jobsite address or city <span class="req-star" aria-hidden="true">*</span></label>
+            <input id="f-where" name="where" type="text" autocomplete="street-address" required>
           </p>
         </div>
 
@@ -178,49 +225,45 @@ End Google Tag Manager (noscript) -->
 
         <div class="fgrid">
           <p class="field">
-            <label for="f-where">Delivery address or city <span class="req-star" aria-hidden="true">*</span></label>
-            <input id="f-where" name="where" type="text" autocomplete="street-address" required>
+            <label for="f-date">Start date <span class="opt">optional</span></label>
+            <input id="f-date" name="date" type="date">
           </p>
           <p class="field">
-            <label for="f-date">Drop-off date <span class="opt">optional</span></label>
-            <input id="f-date" name="date" type="date">
+            <label for="f-standing">How often <span class="opt">optional</span></label>
+            <select id="f-standing" name="standing">
+              <option value="">Choose one…</option>
+              <option>One bin, one time</option>
+              <option>A few swaps on one job</option>
+              <option>Standing rotation</option>
+            </select>
           </p>
         </div>
 
         <p class="field">
-          <label for="f-job">Type of job <span class="opt">optional</span></label>
-          <select id="f-job" name="job">
-            <option value="">Choose one…</option>
-            <option>Residential cleanout or remodel</option>
-            <option>Construction / demo</option>
-            <option>Commercial or ongoing service</option>
-            <option>Landscaping / yard waste</option>
-            <option>Other</option>
-          </select>
+          <label for="f-notes">What's going in it? <span class="opt">optional</span></label>
+          <textarea id="f-notes" name="notes" rows="3" placeholder="Framing scrap, shingles, concrete, mixed demo. Helps us size it and quote the weight."></textarea>
         </p>
 
-        <p class="field">
-          <label for="f-notes">What are you throwing away? <span class="opt">optional</span></label>
-          <textarea id="f-notes" name="notes" rows="3" placeholder="Roughly what's going in the bin. Helps us size it and quote the weight."></textarea>
-        </p>
+        <label class="chk"><input type="checkbox" name="text_ok" value="yes"><span>Text me the quote and updates at this number. Message and data rates may apply. Reply STOP to end.</span></label>
+        <label class="chk" hidden><input type="checkbox" name="offer_ok" value="yes"><span>Email me $50 off my first bin and the occasional contractor offer.</span></label>
 
         <p class="ferr" id="formErr" role="alert" hidden></p>
 
-        <button class="btn btn--red btn--big btn--full" type="submit">
-          <svg class="ic"><use href="#i-msg"/></svg> Write my text message
+        <button class="btn btn--red btn--big btn--full" type="submit" id="binSubmit">
+          <svg class="ic"><use href="#i-arr"/></svg> Get my quote
         </button>
         <p class="fnote">
-          Nothing gets sent from this page and nothing is stored. It opens your own messaging app with the details filled in, and you decide whether to hit send.
+          Your details go to Bear dispatch only. The text and email boxes stay off unless you turn them on.
         </p>
       </form>
 
       <div class="req__out reveal" id="binOut" hidden>
-        <p class="req__out-hd"><svg class="ic"><use href="#i-msg"/></svg> Your message is ready</p>
+        <p class="req__out-hd"><svg class="ic"><use href="#i-msg"/></svg> <span id="binOutHd">Got it. Dispatch has your request.</span></p>
         <pre class="req__msg" id="binMsg"></pre>
         <div class="req__acts">
-          <a class="btn btn--red btn--big btn--full" id="binSend" href="#"><svg class="ic"><use href="#i-msg"/></svg> Open my text app</a>
-          <button class="btn btn--line btn--full" type="button" id="binCopy">Copy the message</button>
-          <a class="btn btn--line btn--full" href="tel:18017854494"><svg class="ic"><use href="#i-phone"/></svg> Call it in instead</a>
+          <a class="btn btn--red btn--big btn--full" id="binSend" href="#" hidden><svg class="ic"><use href="#i-msg"/></svg> Open my text app</a>
+          <button class="btn btn--line btn--full" type="button" id="binCopy" hidden>Copy the message</button>
+          <a class="btn btn--line btn--full" href="tel:18017854494"><svg class="ic"><use href="#i-phone"/></svg> Call dispatch instead</a>
           <button class="btn btn--quiet btn--full" type="button" id="binBack">← Edit my details</button>
         </div>
       </div>
@@ -228,10 +271,10 @@ End Google Tag Manager (noscript) -->
       <aside class="req__side reveal">
         <h3>What happens next</h3>
         <ol class="steps">
-          <li><span class="steps__n">1</span><span class="steps__t"><b>You send the text</b>Or call. The same number does both, and it reaches a person instead of a phone tree.</span></li>
-          <li><span class="steps__n">2</span><span class="steps__t"><b>Dispatch confirms</b>Dispatch gets back to you with the size that fits your job and when we can have it on site.</span></li>
-          <li><span class="steps__n">3</span><span class="steps__t"><b>Bin drops, clock starts</b>You've got 14 days before a daily rental fee starts. Text when it's ready and we'll pull it.</span></li>
-          <li><span class="steps__n">4</span><span class="steps__t"><b>You're billed on weight</b>We weigh what's actually in the bin, so you're not paying for air on a half empty load.</span></li>
+          <li><span class="steps__n">1</span><span class="steps__t"><b>You send the job</b>Or call. The same number does both, and it reaches a person instead of a phone tree.</span></li>
+          <li><span class="steps__n">2</span><span class="steps__t"><b>Dispatch quotes it</b>A text or a call with the price for your address, usually within the hour during the day.</span></li>
+          <li><span class="steps__n">3</span><span class="steps__t"><b>Bin drops, swaps when you text</b>14 days on site before a daily fee starts. Text when it's full and the truck comes.</span></li>
+          <li><span class="steps__n">4</span><span class="steps__t"><b>Billed on weight</b>The first ton is included. After that you pay the scale weight of what was actually in the bin.</span></li>
         </ol>
         <a class="req__line" href="tel:18017854494">
           <i>Rather just call?</i>
@@ -347,6 +390,6 @@ End Google Tag Manager (noscript) -->
 }
 </script>
 
-<script src="/main.js?v=20260925"></script>
+<script src="/main.js?v=20260927"></script>
 </body>
 </html>

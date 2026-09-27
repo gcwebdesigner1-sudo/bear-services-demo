@@ -11,6 +11,7 @@
      gate_business / gate_home      who the bin is for
      form_start                     first focus on the quote form
      form_error {missing}           submit blocked, which fields were empty
+     form_abandon {last_field, filled}   started, never sent, visitor left
      form_submit_business {bin, job, standing, text_ok, offer_ok}
      form_fallback_sms / form_open_sms / form_copy   the text message fallback
      optin_submit / account_submit ── */
@@ -19,9 +20,11 @@
   /* ── analytics loaders: set the two ids and both tools turn on. Loaders stay
      off while an id still contains XXXX. GA4 records every track() event
      below; Clarity records sessions, heatmaps, rage clicks and drop off. ── */
-  var BEAR_GA4 = 'G-XXXXXXXXXX';
-  var BEAR_CLARITY = 'XXXXXXXXXX';
-  if (BEAR_GA4.indexOf('XXXX') < 0) {
+  var BEAR_GA4 = 'G-W0F5XXEYBS';
+  var BEAR_CLARITY = 'yp1cffadyp';
+  // only the real site reports, so local previews and test runs stay out of the numbers
+  var LIVE_HOST = /(^|\.)bearbinsutah\.com$/.test(location.hostname);
+  if (LIVE_HOST && BEAR_GA4.indexOf('XXXX') < 0) {
     var gs = document.createElement('script');
     gs.async = true;
     gs.src = 'https://www.googletagmanager.com/gtag/js?id=' + BEAR_GA4;
@@ -30,7 +33,7 @@
     window.gtag('js', new Date());
     window.gtag('config', BEAR_GA4);
   }
-  if (BEAR_CLARITY.indexOf('XXXX') < 0) {
+  if (LIVE_HOST && BEAR_CLARITY.indexOf('XXXX') < 0) {
     window.clarity = window.clarity || function () { (window.clarity.q = window.clarity.q || []).push(arguments); };
     var cs = document.createElement('script');
     cs.async = true;
@@ -40,9 +43,11 @@
 
   function track(ev, data) {
     var o = { event: ev, page_path: location.pathname };
-    for (var k in data) { if (Object.prototype.hasOwnProperty.call(data, k)) { o[k] = data[k]; } }
+    var p = { page_path: location.pathname };
+    for (var k in data) { if (Object.prototype.hasOwnProperty.call(data, k)) { o[k] = data[k]; p[k] = data[k]; } }
     window.dataLayer.push(o);
-    if (window.gtag && BEAR_GA4.indexOf('XXXX') < 0) { window.gtag('event', ev, o); }
+    if (!LIVE_HOST) return;
+    if (window.gtag && BEAR_GA4.indexOf('XXXX') < 0) { window.gtag('event', ev, p); }
     if (window.clarity && BEAR_CLARITY.indexOf('XXXX') < 0) { try { window.clarity('event', ev); } catch (e) {} }
   }
   document.addEventListener('click', function (ev) {
@@ -228,11 +233,31 @@
       out.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    var started = false;
-    form.addEventListener('focusin', function () {
+    var started = false, finished = false, leftSent = false, lastField = '';
+    form.addEventListener('focusin', function (e) {
+      if (e.target && e.target.name) { lastField = e.target.name; }
       if (started) return;
       started = true;
       track('form_start', {});
+    });
+
+    // drop off: the form was started, never sent, and the visitor is leaving
+    function filledCount() {
+      var n = 0;
+      ['company', 'name', 'phone', 'email', 'project', 'where', 'size', 'date', 'standing', 'notes'].forEach(function (k) {
+        var el = form.elements[k];
+        if (el && el.value && String(el.value).trim()) { n++; }
+      });
+      return n;
+    }
+    function leaving() {
+      if (!started || finished || leftSent) return;
+      leftSent = true;
+      track('form_abandon', { last_field: lastField, filled: filledCount() });
+    }
+    window.addEventListener('pagehide', leaving);
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'hidden') { leaving(); }
     });
 
     form.addEventListener('submit', function (e) {
@@ -302,10 +327,12 @@
       submitB.disabled = true;
       submitB.textContent = 'Sending…';
       postLead(fields).then(function () {
+        finished = true;
         track('form_submit_business', { bin: f.size, job: f.project, standing: f.standing || '', text_ok: fields.text_ok, offer_ok: fields.offer_ok });
         showOut('sent', 'Got it. Dispatch has your request.',
           'Dispatch will text or call ' + f.phone + ' with the price for ' + f.where + ', usually within the hour during the day.\n\n' + summary);
       }).catch(function () {
+        finished = true;
         track('form_fallback_sms', { bin: f.size, job: f.project });
         var msg = "Hi Bear Services, I'd like a quote on a bin.\n\n" + summary;
         sendA.href = 'sms:' + TEL + '?&body=' + encodeURIComponent(msg);
