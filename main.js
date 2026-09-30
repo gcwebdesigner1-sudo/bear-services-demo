@@ -22,6 +22,14 @@
      below; Clarity records sessions, heatmaps, rage clicks and drop off. ── */
   var BEAR_GA4 = 'G-W0F5XXEYBS';
   var BEAR_CLARITY = 'yp1cffadyp';
+  /* Google Ads conversions ride on the same Google tag. Each event below that
+     has a label also counts as a conversion in the Ads account. */
+  var BEAR_ADS = 'AW-18478960913';
+  var ADS_LABELS = {
+    form_submit_business: 'aeg0CLGZjowdEJGiuutE', // Quote form submit
+    account_submit: 'XwqECLSZjowdEJGiuutE',       // Contractor account request
+    contact_click: 'FPH9CLeZjowdEJGiuutE'         // Phone or text tap (secondary)
+  };
   // only the real site reports, so local previews and test runs stay out of the numbers
   var LIVE_HOST = /(^|\.)bearbinsutah\.com$/.test(location.hostname);
   if (LIVE_HOST && BEAR_GA4.indexOf('XXXX') < 0) {
@@ -32,6 +40,7 @@
     window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
     window.gtag('js', new Date());
     window.gtag('config', BEAR_GA4);
+    window.gtag('config', BEAR_ADS);
   }
   if (LIVE_HOST && BEAR_CLARITY.indexOf('XXXX') < 0) {
     window.clarity = window.clarity || function () { (window.clarity.q = window.clarity.q || []).push(arguments); };
@@ -47,7 +56,10 @@
     for (var k in data) { if (Object.prototype.hasOwnProperty.call(data, k)) { o[k] = data[k]; p[k] = data[k]; } }
     window.dataLayer.push(o);
     if (!LIVE_HOST) return;
-    if (window.gtag && BEAR_GA4.indexOf('XXXX') < 0) { window.gtag('event', ev, p); }
+    if (window.gtag && BEAR_GA4.indexOf('XXXX') < 0) {
+      window.gtag('event', ev, p);
+      if (ADS_LABELS[ev]) { window.gtag('event', 'conversion', { send_to: BEAR_ADS + '/' + ADS_LABELS[ev] }); }
+    }
     if (window.clarity && BEAR_CLARITY.indexOf('XXXX') < 0) { try { window.clarity('event', ev); } catch (e) {} }
   }
   document.addEventListener('click', function (ev) {
