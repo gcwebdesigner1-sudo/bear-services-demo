@@ -150,6 +150,7 @@
      Events: gate_business, gate_home, form_submit_business, form_fallback_sms,
              optin_submit, account_submit ─────────────────────────────────── */
   var LEAD_ENDPOINT = 'https://formsubmit.co/ajax/6d11c64cf1c7f0f056ca805e64691e44';
+  var LEAD_CC = 'brad@bearbinsutah.com'; // Bear gets a copy of every quote and account request
   var TEL = '8017854494';
   var OFFER_AMOUNT = '$50';
   var OFFER_CODE = 'BEAR50';
@@ -321,7 +322,9 @@
       var summary = lines.join('\n');
 
       var fields = {
-        _subject: 'Bear quote request: ' + f.company,
+        // name, phone and jobsite up front so a text alert built from the subject is enough to call back
+        _subject: 'Bear quote request: ' + f.company + ', ' + f.name + ' ' + f.phone + ', ' + f.size + ' at ' + f.where,
+        _cc: LEAD_CC,
         _replyto: f.email,
         company: f.company, name: f.name, phone: f.phone, email: f.email, project: f.project,
         where: f.where, size: f.size, start: f.date, standing: f.standing, notes: f.notes,
@@ -424,7 +427,8 @@
           '. Mention it when you text or call dispatch at (801) 785-4494 with the address and what is going in the bin. ' +
           'Bear Services, 581 W 1600 N, Orem, Utah. Reply stop to end these emails.';
       } else {
-        fields._subject = 'Bear contractor account request: ' + (fields.business || '');
+        fields._subject = 'Bear contractor account request: ' + (fields.business || '') + ', ' + (fields.contact || '') + ' ' + (fields.phone || '');
+        fields._cc = LEAD_CC;
       }
       fields.consent_at = new Date().toISOString();
       var btn = f.querySelector('button[type="submit"]');
