@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260924">
+<link rel="stylesheet" href="styles.css?v=20261003">
 <link rel="canonical" href="https://bearbinsutah.com/">
 <meta name="theme-color" content="#0e1114">
 <meta name="robots" content="index,follow">
@@ -215,6 +215,7 @@ End Google Tag Manager (noscript) -->
       <p class="eyebrow">The equipment</p>
       <h2>Two bins. Pick the one that fits.</h2>
       <p class="lede">Both are open-top roll-offs with a max fill line. Measurements below are the outside of the bin, so you can check it against the site before you order.</p>
+      <p class="shead__act"><button type="button" class="btn btn--line findbtn" data-finder-open="sizes"><svg class="ic"><use href="#i-scale"/></svg> Not sure which one? Answer 3 quick questions</button></p>
     </header>
 
     <div class="bins">
@@ -229,7 +230,7 @@ End Google Tag Manager (noscript) -->
             <div class="bin__dims"><dt>Dimensions</dt><dd>12 ft &times; 7½ ft &times; 5½ ft</dd></div>
           </dl>
           <p class="bin__note">The finish stage bin. Drywall, trim, flooring, packaging and tenant turnovers.</p>
-          <a class="btn btn--line btn--full" href="tel:18017854494">Order a 15 yard <svg class="ic"><use href="#i-arr"/></svg></a>
+          <a class="btn btn--line btn--full" href="#request" data-pick-size="15 yard bin">Get a 15 yard quote <svg class="ic"><use href="#i-arr"/></svg></a>
         </div>
       </article>
 
@@ -245,7 +246,7 @@ End Google Tag Manager (noscript) -->
             <div class="bin__dims"><dt>Dimensions</dt><dd>22 ft &times; 7½ ft &times; 6 ft</dd></div>
           </dl>
           <p class="bin__note">Double the capacity for full construction jobs, big demos and commercial volume.</p>
-          <a class="btn btn--red btn--full" href="tel:18017854494">Order a 30 yard <svg class="ic"><use href="#i-arr"/></svg></a>
+          <a class="btn btn--red btn--full" href="#request" data-pick-size="30 yard bin">Get a 30 yard quote <svg class="ic"><use href="#i-arr"/></svg></a>
         </div>
       </article>
     </div>
@@ -258,7 +259,7 @@ End Google Tag Manager (noscript) -->
     <header class="shead reveal">
       <p class="eyebrow">Get a quote</p>
       <h2>Tell us the job.<br>Dispatch quotes it.</h2>
-      <p class="lede">For contractors, builders, property managers and businesses. Send the job below and dispatch texts or calls you back with the price for your address. Rather talk? (801) 785-4494 reaches a person.</p>
+      <p class="lede">Contractors, businesses and home projects. Send the job below and dispatch texts or calls you back with the price for your address. Rather talk? (801) 785-4494 reaches a person.</p>
     </header>
 
     <fieldset class="gate reveal">
@@ -270,20 +271,13 @@ End Google Tag Manager (noscript) -->
     </fieldset>
 
     <div class="req">
-      <div class="gate__home reveal" data-gate-show="home">
-        <h3>Right now our bins are booked for contractors and businesses.</h3>
-        <p>We're not taking new home jobs through this form. If it's a small job and you'd still like to ask, call or text dispatch and you'll get an honest answer on whether we can fit you in.</p>
-        <div class="ctas">
-          <a class="btn btn--red" href="tel:18017854494"><svg class="ic"><use href="#i-phone"/></svg> Call (801) 785-4494</a>
-          <a class="btn btn--line" href="sms:8017854494"><svg class="ic"><use href="#i-msg"/></svg> Text the same number</a>
-        </div>
-      </div>
 
-      <form class="req__form reveal" id="binForm" novalidate data-gate-show="business" data-clarity-mask="true">
+      <form class="req__form reveal" id="binForm" novalidate data-gate-show="business home" data-clarity-mask="true">
+        <p class="req__home" data-only="home" hidden><b>Home project? Send it over.</b>Tell us what's going in the bin and where it goes, and dispatch will text or call you with the price for your address.</p>
         <div class="fgrid">
-          <p class="field">
+          <p class="field" data-only="business">
             <label for="f-company">Company <span class="req-star" aria-hidden="true">*</span></label>
-            <input id="f-company" name="company" type="text" autocomplete="organization" required>
+            <input id="f-company" name="company" type="text" autocomplete="organization" required data-req>
           </p>
           <p class="field">
             <label for="f-name">Your name <span class="req-star" aria-hidden="true">*</span></label>
@@ -329,13 +323,14 @@ End Google Tag Manager (noscript) -->
             <label class="seg__o"><input type="radio" name="size" value="not sure which size, please advise"><span><b>Not sure</b><i>Size it for me</i></span></label>
           </div>
         </fieldset>
+        <p class="sizehelp">Not sure? <button type="button" class="linkbtn" data-finder-open="form">Answer 3 quick questions</button> and we'll pick the size.</p>
 
         <div class="fgrid">
           <p class="field">
             <label for="f-date">Start date <span class="opt">optional</span></label>
             <input id="f-date" name="date" type="date">
           </p>
-          <p class="field">
+          <p class="field" data-only="business">
             <label for="f-standing">How often <span class="opt">optional</span></label>
             <select id="f-standing" name="standing">
               <option value="">Choose one…</option>
@@ -990,6 +985,7 @@ End Google Tag Manager (noscript) -->
 }
 </script>
 
-<script src="main.js?v=20261002"></script>
+<script src="main.js?v=20261003"></script>
+<script src="finder.js?v=20261003"></script>
 </body>
 </html>

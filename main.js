@@ -62,6 +62,7 @@
     }
     if (window.clarity && BEAR_CLARITY.indexOf('XXXX') < 0) { try { window.clarity('event', ev); } catch (e) {} }
   }
+  window.bearTrack = track;   // the bin finder reports through the same pipe
   document.addEventListener('click', function (ev) {
     var a = ev.target.closest && ev.target.closest('a[href^="tel:"],a[href^="sms:"]');
     if (!a) return;
@@ -71,6 +72,61 @@
       placement: sec ? (sec.id || sec.className.split(' ')[0]) : 'page'
     });
   });
+
+  /* ── phone and text links on a computer: tel: and sms: do nothing on most PCs, so a
+     click shows the number with a copy button and a way to send the job online ── */
+  var DESKTOP = !!(window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+  var pop = null;
+  function fmtNum(href) {
+    var d = href.replace(/\D/g, '').slice(-10);
+    return d.length === 10 ? '(' + d.slice(0, 3) + ') ' + d.slice(3, 6) + '-' + d.slice(6) : href.replace(/^(tel|sms):/, '');
+  }
+  function closePop() { if (pop) { pop.hidden = true; } }
+  function showPop(a) {
+    var href = a.getAttribute('href'), isText = href.indexOf('sms:') === 0, num = fmtNum(href);
+    var mainLine = href.replace(/\D/g, '').slice(-10) === TEL;
+    if (!pop) {
+      pop = document.createElement('div');
+      pop.className = 'callpop';
+      pop.setAttribute('role', 'dialog');
+      pop.setAttribute('aria-label', 'Call or text dispatch');
+      document.body.appendChild(pop);
+      pop.addEventListener('click', function (e) {
+        var t = e.target.closest && e.target.closest('[data-pop]');
+        if (!t) { return; }
+        var what = t.getAttribute('data-pop');
+        if (what === 'x' || what === 'quote') { closePop(); }
+        if (what === 'copy') {
+          var n = t.getAttribute('data-num');
+          var ok = function () { t.textContent = 'Copied'; setTimeout(function () { t.textContent = 'Copy number'; }, 2400); };
+          if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(n).then(ok, function () {}); }
+          track('contact_copy', { number: n });
+        }
+      });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closePop(); } });
+      document.addEventListener('click', function (e) {
+        if (!pop || pop.hidden || pop.contains(e.target)) { return; }
+        if (e.target.closest && e.target.closest('a[href^="tel:"],a[href^="sms:"]')) { return; }
+        closePop();
+      });
+    }
+    var quoteHref = document.getElementById('binForm') ? '#request' : '/#request';
+    pop.innerHTML = '<button type="button" class="callpop__x" data-pop="x" aria-label="Close">×</button>' +
+      '<p class="callpop__k">' + (isText ? 'Text this number from your phone' : 'Call from your phone') + '</p>' +
+      '<p class="callpop__n">' + num + '</p>' +
+      '<div class="callpop__acts"><button type="button" class="btn btn--line" data-pop="copy" data-num="' + num + '">Copy number</button>' +
+      (mainLine ? '<a class="btn btn--red" data-pop="quote" href="' + quoteHref + '">Send the job online</a>' : '') + '</div>' +
+      '<p class="callpop__f">A person answers, not a phone tree.</p>';
+    pop.hidden = false;
+  }
+  if (DESKTOP) {
+    document.addEventListener('click', function (ev) {
+      var a = ev.target.closest && ev.target.closest('a[href^="tel:"],a[href^="sms:"]');
+      if (!a || (pop && pop.contains(a))) { return; }
+      ev.preventDefault();
+      showPop(a);
+    });
+  }
 
   /* ── scroll reveals ── */
   var revealables = document.querySelectorAll('.reveal');
@@ -182,18 +238,67 @@
     gates.forEach(function (g) {
       [].forEach.call(g.querySelectorAll('.gate__o input'), function (r) { r.checked = (r.value === choice); });
       [].forEach.call(g.querySelectorAll('[data-gate-show]'), function (el) {
-        el.hidden = (el.getAttribute('data-gate-show') !== choice);
+        el.hidden = (el.getAttribute('data-gate-show').split(' ').indexOf(choice) < 0);
         if (!el.hidden) { el.classList.add('in'); }
       });
     });
+    applyMode(choice);
     try { sessionStorage.setItem(GATE_KEY, choice); } catch (e) {}
     if (!silent) { track(choice === 'home' ? 'gate_home' : 'gate_business', {}); }
   }
+  /* the quote form serves both: business mode asks for the company and how often,
+     home mode drops those and swaps in home job types */
+  var PROJECTS = {
+    business: ['New build', 'Remodel or tenant improvement', 'Roofing tear off', 'Demolition', 'Landscaping or excavation',
+      'Standing commercial rotation', 'Property turnover or cleanout', 'Other business job'],
+    home: ['Garage or home cleanout', 'Remodel or renovation', 'Roofing', 'Yard or landscaping', 'Concrete, dirt or rock',
+      'Construction or demo', 'Moving or estate cleanout', 'Something else']
+  };
+  var FINDER_JOB = {
+    business: { junk: 'Property turnover or cleanout', remodel: 'Remodel or tenant improvement', yard: 'Landscaping or excavation',
+      roof: 'Roofing tear off', heavy: 'Landscaping or excavation', build: 'New build' },
+    home: { junk: 'Garage or home cleanout', remodel: 'Remodel or renovation', yard: 'Yard or landscaping',
+      roof: 'Roofing', heavy: 'Concrete, dirt or rock', build: 'Construction or demo' }
+  };
+  function fillFinderJob() {
+    var fm = document.getElementById('binForm');
+    if (!fm) { return; }
+    var mat = fm.getAttribute('data-finder-material'), mode = fm.getAttribute('data-mode'), sel = fm.elements['project'];
+    if (!mat || !mode || !sel || sel.value) { return; }
+    var job = FINDER_JOB[mode] && FINDER_JOB[mode][mat];
+    if (job) { sel.value = job; }
+  }
+  function applyMode(choice) {
+    var fm = document.getElementById('binForm');
+    if (!fm || (choice !== 'business' && choice !== 'home')) { return; }
+    if (fm.getAttribute('data-mode') !== choice) {
+      fm.setAttribute('data-mode', choice);
+      [].forEach.call(fm.querySelectorAll('[data-only]'), function (el) {
+        var on = el.getAttribute('data-only') === choice;
+        el.hidden = !on;
+        [].forEach.call(el.querySelectorAll('[data-req]'), function (i) { i.required = on; });
+      });
+      var sel = fm.elements['project'];
+      if (sel) {
+        var keep = sel.value;
+        sel.innerHTML = '<option value="">Choose one…</option>' + PROJECTS[choice].map(function (p) { return '<option>' + p + '</option>'; }).join('');
+        if (PROJECTS[choice].indexOf(keep) >= 0) { sel.value = keep; }
+      }
+      var wl = fm.querySelector('label[for="f-where"]');
+      if (wl && wl.firstChild && wl.firstChild.nodeType === 3) {
+        wl.firstChild.nodeValue = choice === 'home' ? 'Address or city ' : 'Jobsite address or city ';
+      }
+    }
+    fillFinderJob();
+  }
+
   if (gates.length) {
     var remembered = null;
     try { remembered = sessionStorage.getItem(GATE_KEY); } catch (e) {}
     var preset = gates[0].getAttribute('data-gate-default');
-    if (preset) { setGate(preset, true); }
+    var asked = (location.search.match(/[?&]for=(home|business)(&|$)/) || [])[1];   // links like /?for=home#request
+    if (asked) { setGate(asked, true); }
+    else if (preset) { setGate(preset, true); }
     else if (remembered === 'business' || remembered === 'home') { setGate(remembered, true); }
     else {
       gates.forEach(function (g) {
@@ -275,6 +380,7 @@
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      var mode = form.getAttribute('data-mode') === 'home' ? 'home' : 'business';
 
       var f = {
         company: val('company'), name: val('name'), phone: val('phone'), email: val('email'),
@@ -283,7 +389,7 @@
       };
 
       var missing = [];
-      if (!f.company) { missing.push('your company'); }
+      if (mode === 'business' && !f.company) { missing.push('your company'); }
       if (!f.name)    { missing.push('your name'); }
       if (!f.phone)   { missing.push('a phone number'); }
       if (!validEmail(f.email)) { missing.push('a working email'); }
@@ -291,7 +397,7 @@
       if (!f.where)   { missing.push('where the bin goes'); }
       if (!f.size)    { missing.push('a bin size'); }
 
-      flag(form.elements['company'], !f.company);
+      flag(form.elements['company'], mode === 'business' && !f.company);
       flag(form.elements['name'],    !f.name);
       flag(form.elements['phone'],   !f.phone);
       flag(form.elements['email'],   !validEmail(f.email));
@@ -312,7 +418,8 @@
       lastSize = f.size;
 
       var lines = [];
-      lines.push('Company: ' + f.company);
+      if (mode === 'home') { f.company = ''; f.standing = ''; }
+      lines.push(mode === 'home' ? 'Customer: home project' : 'Company: ' + f.company);
       lines.push('Contact: ' + f.name + ', ' + f.phone + ', ' + f.email);
       lines.push('Job: ' + f.project + (f.standing ? ' (' + f.standing + ')' : ''));
       lines.push('Bin: ' + f.size);
@@ -323,9 +430,13 @@
 
       var fields = {
         // name, phone and jobsite up front so a text alert built from the subject is enough to call back
-        _subject: 'Bear quote request: ' + f.company + ', ' + f.name + ' ' + f.phone + ', ' + f.size + ' at ' + f.where,
+        // home requests say so up front so dispatch can tell them apart at a glance
+        _subject: mode === 'home'
+          ? 'Bear home quote request: ' + f.name + ' ' + f.phone + ', ' + f.size + ' at ' + f.where
+          : 'Bear quote request: ' + f.company + ', ' + f.name + ' ' + f.phone + ', ' + f.size + ' at ' + f.where,
         _cc: LEAD_CC,
         _replyto: f.email,
+        customer: mode,
         company: f.company, name: f.name, phone: f.phone, email: f.email, project: f.project,
         where: f.where, size: f.size, start: f.date, standing: f.standing, notes: f.notes,
         text_ok: checked('text_ok') ? 'yes' : 'no',
@@ -343,7 +454,8 @@
       submitB.textContent = 'Sending…';
       postLead(fields).then(function () {
         finished = true;
-        track('form_submit_business', { bin: f.size, job: f.project, standing: f.standing || '', text_ok: fields.text_ok, offer_ok: fields.offer_ok });
+        // only business requests count as the Google Ads conversion, so bidding never learns to chase homeowners
+        track(mode === 'home' ? 'form_submit_home' : 'form_submit_business', { bin: f.size, job: f.project, standing: f.standing || '', text_ok: fields.text_ok, offer_ok: fields.offer_ok });
         showOut('sent', 'Got it. Dispatch has your request.',
           'Dispatch will text or call ' + f.phone + ' with the price for ' + f.where + ', usually within the hour during the day.\n\n' + summary);
       }).catch(function () {
@@ -388,9 +500,40 @@
       out.hidden = true;
       form.hidden = false;
       form.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      form.elements['company'].focus({ preventScroll: true });
+      form.elements[form.getAttribute('data-mode') === 'home' ? 'name' : 'company'].focus({ preventScroll: true });
     });
   }
+
+  /* ── bin card buttons and the bin finder hand a size to the quote form ── */
+  function applyFinderPick(d) {
+    var fm = document.getElementById('binForm');
+    if (!fm || !d) { return false; }
+    var r = d.size && fm.querySelector('input[name="size"][value="' + d.size + '"]');
+    if (r) { r.checked = true; }
+    var notes = fm.elements['notes'];
+    if (notes && d.note && notes.value.indexOf('Bin finder:') < 0) { notes.value = d.note + (notes.value ? '\n' + notes.value : ''); }
+    if (d.material) { fm.setAttribute('data-finder-material', d.material); }
+    fillFinderJob();
+    var sec = document.getElementById('request');
+    if (sec) { revealAt('#request'); sec.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    return true;
+  }
+  document.addEventListener('bear:finder-pick', function (e) { if (applyFinderPick(e.detail)) { e.preventDefault(); } });
+  try {
+    var savedPick = sessionStorage.getItem('bear.finder');
+    if (savedPick && document.getElementById('binForm')) { sessionStorage.removeItem('bear.finder'); applyFinderPick(JSON.parse(savedPick)); }
+  } catch (e) {}
+  document.addEventListener('click', function (ev) {
+    var b = ev.target.closest && ev.target.closest('[data-pick-size]');
+    if (!b) { return; }
+    var fm = document.getElementById('binForm');
+    var size = b.getAttribute('data-pick-size');
+    if (fm) {
+      var r = fm.querySelector('input[name="size"][value="' + size + '"]');
+      if (r) { r.checked = true; }
+    }
+    track('size_pick', { bin: size });
+  });
 
   /* ── offer opt in + contractor account (small forms, same endpoint) ── */
   [].forEach.call(document.querySelectorAll('form[data-lead]'), function (f) {

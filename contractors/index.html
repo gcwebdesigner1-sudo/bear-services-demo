@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=20260924">
+<link rel="stylesheet" href="/styles.css?v=20261003">
 <link rel="canonical" href="https://bearbinsutah.com/contractors/">
 <meta name="theme-color" content="#0e1114">
 <meta name="robots" content="index,follow">
@@ -122,20 +122,13 @@ End Google Tag Manager (noscript) -->
     </fieldset>
 
     <div class="req">
-      <div class="gate__home reveal" data-gate-show="home">
-        <h3>Right now our bins are booked for contractors and businesses.</h3>
-        <p>We're not taking new home jobs through this form. If it's a small job and you'd still like to ask, call or text dispatch and you'll get an honest answer on whether we can fit you in.</p>
-        <div class="ctas">
-          <a class="btn btn--red" href="tel:18017854494"><svg class="ic"><use href="#i-phone"/></svg> Call (801) 785-4494</a>
-          <a class="btn btn--line" href="sms:8017854494"><svg class="ic"><use href="#i-msg"/></svg> Text the same number</a>
-        </div>
-      </div>
 
-      <form class="req__form reveal" id="binForm" novalidate data-gate-show="business" data-clarity-mask="true">
+      <form class="req__form reveal" id="binForm" novalidate data-gate-show="business home" data-clarity-mask="true">
+        <p class="req__home" data-only="home" hidden><b>Home project? Send it over.</b>Tell us what's going in the bin and where it goes, and dispatch will text or call you with the price for your address.</p>
         <div class="fgrid">
-          <p class="field">
+          <p class="field" data-only="business">
             <label for="f-company">Company <span class="req-star" aria-hidden="true">*</span></label>
-            <input id="f-company" name="company" type="text" autocomplete="organization" required>
+            <input id="f-company" name="company" type="text" autocomplete="organization" required data-req>
           </p>
           <p class="field">
             <label for="f-name">Your name <span class="req-star" aria-hidden="true">*</span></label>
@@ -181,13 +174,14 @@ End Google Tag Manager (noscript) -->
             <label class="seg__o"><input type="radio" name="size" value="not sure which size, please advise"><span><b>Not sure</b><i>Size it for me</i></span></label>
           </div>
         </fieldset>
+        <p class="sizehelp">Not sure? <button type="button" class="linkbtn" data-finder-open="form">Answer 3 quick questions</button> and we'll pick the size.</p>
 
         <div class="fgrid">
           <p class="field">
             <label for="f-date">Start date <span class="opt">optional</span></label>
             <input id="f-date" name="date" type="date">
           </p>
-          <p class="field">
+          <p class="field" data-only="business">
             <label for="f-standing">How often <span class="opt">optional</span></label>
             <select id="f-standing" name="standing">
               <option value="">Choose one…</option>
@@ -559,6 +553,7 @@ End Google Tag Manager (noscript) -->
 }
 </script>
 
-<script src="/main.js?v=20261002"></script>
+<script src="/main.js?v=20261003"></script>
+<script src="/finder.js?v=20261003"></script>
 </body>
 </html>
