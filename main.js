@@ -454,6 +454,7 @@
       submitB.textContent = 'Sending…';
       postLead(fields).then(function () {
         finished = true;
+        try { localStorage.setItem('bear.finderSeen', String(Date.now())); } catch (err) {}   // no size prompt after a request
         // only business requests count as the Google Ads conversion, so bidding never learns to chase homeowners
         track(mode === 'home' ? 'form_submit_home' : 'form_submit_business', { bin: f.size, job: f.project, standing: f.standing || '', text_ok: fields.text_ok, offer_ok: fields.offer_ok });
         showOut('sent', 'Got it. Dispatch has your request.',

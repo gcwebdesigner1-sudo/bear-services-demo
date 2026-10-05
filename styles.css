@@ -862,3 +862,14 @@ html:has(.bf[open]){overflow:hidden}
 .sc-bin b:last-child{right:12px}
 @media(max-width:620px){.sc-bin{width:80px;height:36px}.sc-bin--30{width:124px;height:40px}}
 @media(prefers-reduced-motion:reduce){.bf *,.bf{animation-duration:.01ms!important;animation-delay:0ms!important}}
+
+/* finder nudge: the phone version of the timed prompt, parked above the call bar */
+.bfnudge{position:fixed;z-index:80;left:12px;right:12px;bottom:calc(68px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;
+  padding:14px 44px 14px 14px;background:var(--white);border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 50px -18px rgba(14,17,20,.45);animation:fade-up .35s var(--ease)}
+.bfnudge__ic{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--red-soft);color:var(--red-d)}
+.bfnudge__tx b{display:block;font-size:15.5px;letter-spacing:-.02em;color:var(--ink)}
+.bfnudge__tx i{display:block;font-style:normal;font-size:13px;color:var(--slate);margin-top:2px}
+.bfnudge__go{grid-column:1/-1;font-size:15px;padding:12px 16px}
+.bfnudge__x{position:absolute;top:6px;right:6px;width:34px;height:34px;border:0;background:none;border-radius:50%;cursor:pointer;font:500 20px/1 var(--f);color:var(--slate)}
+.bfnudge__x:hover{background:var(--soft);color:var(--ink)}
+@media(min-width:701px){.bfnudge{left:auto;right:24px;bottom:24px;width:360px}}

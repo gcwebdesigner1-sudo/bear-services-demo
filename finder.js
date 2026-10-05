@@ -202,6 +202,7 @@
   function open(where) {
     if (!dlg) { build(); }
     placement = where || 'page';
+    markSeen();
     state = { step: 0, answers: {}, size: null, busy: false };
     dlg.removeAttribute('data-theme');
     el.scene.innerHTML = '';
@@ -241,7 +242,7 @@
     state.step = step;
     var a = state.answers, html = '';
     if (step === 0) {
-      html = '<h2 class="bf__q" id="bfTitle" tabindex="-1">What are you getting rid of?</h2><p class="bf__hint">Three quick taps and I\'ll size your bin.</p><ul class="bf__opts bf__opts--6">' +
+      html = '<h2 class="bf__q" id="bfTitle" tabindex="-1">What are you getting rid of?</h2><p class="bf__hint">' + (placement === 'auto' ? 'Not sure which bin you need? Three quick taps and I\'ll size it.' : 'Three quick taps and I\'ll size your bin.') + '</p><ul class="bf__opts bf__opts--6">' +
         MATERIALS.map(function (m) { return option('material', m.id, m.label, m.sub, m.id, a.material === m.id); }).join('') + '</ul>';
     } else if (step === 1) {
       html = '<h2 class="bf__q" id="bfTitle" tabindex="-1">How big is the job?</h2><p class="bf__hint">A rough guess is fine.</p><ul class="bf__opts">' +
@@ -347,6 +348,72 @@
       location.href = '/#request';
     }
   }
+
+  /* ── timed prompt: after AUTO_SECONDS on the site this visit (counted across pages), offer the
+     finder once. Computers get the finder itself; phones get a small card above the call bar,
+     because a full screen popup on a phone is what Google calls an intrusive interstitial.
+     Never while someone is typing in a form or after they sent one, and not again for 7 days
+     once it has been shown, opened or dismissed. ── */
+  var AUTO_SECONDS = +window.BEAR_FINDER_AUTO || 20;   // the window overrides exist for tests
+  var MIN_ON_PAGE = +window.BEAR_FINDER_MIN || 5;      // never the instant a page opens
+  var SNOOZE_DAYS = 7;
+  var SEEN_KEY = 'bear.finderSeen', T0_KEY = 'bear.t0';
+  function store(kind, k, v) {
+    try {
+      var s = window[kind];
+      if (v === undefined) { return s.getItem(k); }
+      s.setItem(k, v);
+    } catch (e) {}
+    return null;
+  }
+  function markSeen() { store('localStorage', SEEN_KEY, String(Date.now())); }
+  function recentlySeen() {
+    var t = +store('localStorage', SEEN_KEY) || 0;
+    return t > 0 && (Date.now() - t) < SNOOZE_DAYS * 864e5;
+  }
+  function small() {
+    return !!(window.matchMedia && (window.matchMedia('(max-width: 700px)').matches || window.matchMedia('(pointer: coarse)').matches));
+  }
+  function busy() {
+    var a = document.activeElement;
+    if (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) { return true; }
+    if (document.querySelector('dialog[open], .callpop:not([hidden]), .bfnudge')) { return true; }
+    var out = document.getElementById('binOut');
+    return !!(out && !out.hidden);
+  }
+  function showNudge() {
+    var n = document.createElement('div');
+    n.className = 'bfnudge';
+    n.setAttribute('role', 'dialog');
+    n.setAttribute('aria-label', 'Find the right bin size');
+    n.innerHTML = '<button type="button" class="bfnudge__x" data-nudge="x" aria-label="Close">×</button>' +
+      '<span class="bfnudge__ic">' + svg('junk') + '</span>' +
+      '<span class="bfnudge__tx"><b>Not sure which bin you need?</b><i>3 quick questions and we\'ll pick the size.</i></span>' +
+      '<button type="button" class="btn btn--red btn--full bfnudge__go" data-nudge="go">Find my bin</button>';
+    document.body.appendChild(n);
+    n.addEventListener('click', function (e) {
+      var t = e.target.closest && e.target.closest('[data-nudge]');
+      if (!t) { return; }
+      n.parentNode.removeChild(n);
+      if (t.getAttribute('data-nudge') === 'go') { open('nudge'); } else { track('finder_nudge_close', {}); }
+    });
+    track('finder_nudge', {});
+  }
+  function autoPrompt() {
+    if (recentlySeen() || /^\/(privacy|review)\//.test(location.pathname)) { return; }
+    var t0 = +store('sessionStorage', T0_KEY) || 0;
+    if (!t0) { t0 = Date.now(); store('sessionStorage', T0_KEY, String(t0)); }
+    var formTouched = false;
+    document.addEventListener('focusin', function (e) { if (e.target.closest && e.target.closest('form')) { formTouched = true; } });
+    function attempt() {
+      if (recentlySeen() || formTouched) { return; }
+      if (document.hidden || busy()) { setTimeout(attempt, 4000); return; }
+      markSeen();
+      if (small()) { showNudge(); } else { open('auto'); }
+    }
+    setTimeout(attempt, Math.max(MIN_ON_PAGE * 1000, AUTO_SECONDS * 1000 - (Date.now() - t0)));
+  }
+  if (location.hash !== '#find-my-bin') { autoPrompt(); }
 
   document.addEventListener('click', function (e) {
     var t = e.target.closest && e.target.closest('[data-finder-open]');
