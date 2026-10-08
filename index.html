@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20261004">
+<link rel="stylesheet" href="styles.css?v=20261008">
 <link rel="canonical" href="https://bearbinsutah.com/">
 <meta name="theme-color" content="#0e1114">
 <meta name="robots" content="index,follow">
@@ -275,45 +275,19 @@ End Google Tag Manager (noscript) -->
       <form class="req__form reveal" id="binForm" novalidate data-gate-show="business home" data-clarity-mask="true">
         <p class="req__home" data-only="home" hidden><b>Home project? Send it over.</b>Tell us what's going in the bin and where it goes, and dispatch will text or call you with the price for your address.</p>
         <div class="fgrid">
-          <p class="field" data-only="business">
-            <label for="f-company">Company <span class="req-star" aria-hidden="true">*</span></label>
-            <input id="f-company" name="company" type="text" autocomplete="organization" required data-req>
-          </p>
           <p class="field">
             <label for="f-name">Your name <span class="req-star" aria-hidden="true">*</span></label>
             <input id="f-name" name="name" type="text" autocomplete="name" required>
           </p>
-        </div>
-        <div class="fgrid">
           <p class="field">
             <label for="f-phone">Phone <span class="req-star" aria-hidden="true">*</span></label>
             <input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required>
           </p>
-          <p class="field">
-            <label for="f-email">Email <span class="req-star" aria-hidden="true">*</span></label>
-            <input id="f-email" name="email" type="email" autocomplete="email" required>
-          </p>
         </div>
-        <div class="fgrid">
-          <p class="field">
-            <label for="f-project">Type of job <span class="req-star" aria-hidden="true">*</span></label>
-            <select id="f-project" name="project" required>
-              <option value="">Choose one…</option>
-              <option>New build</option>
-              <option>Remodel or tenant improvement</option>
-              <option>Roofing tear off</option>
-              <option>Demolition</option>
-              <option>Landscaping or excavation</option>
-              <option>Standing commercial rotation</option>
-              <option>Property turnover or cleanout</option>
-              <option>Other business job</option>
-            </select>
-          </p>
-          <p class="field">
-            <label for="f-where">Jobsite address or city <span class="req-star" aria-hidden="true">*</span></label>
-            <input id="f-where" name="where" type="text" autocomplete="street-address" required>
-          </p>
-        </div>
+        <p class="field">
+          <label for="f-where">Jobsite address or city <span class="req-star" aria-hidden="true">*</span></label>
+          <input id="f-where" name="where" type="text" autocomplete="street-address" required>
+        </p>
 
         <fieldset class="field field--set">
           <legend>Bin size <span class="req-star" aria-hidden="true">*</span></legend>
@@ -325,11 +299,38 @@ End Google Tag Manager (noscript) -->
         </fieldset>
         <p class="sizehelp">Not sure? <button type="button" class="linkbtn" data-finder-open="form">Answer 3 quick questions</button> and we'll pick the size.</p>
 
-        <div class="fgrid">
-          <p class="field">
-            <label for="f-date">Start date <span class="opt">optional</span></label>
-            <input id="f-date" name="date" type="date">
-          </p>
+        <button type="button" class="linkbtn more-toggle" data-more aria-expanded="false" aria-controls="moreFields">+ Add details <span class="opt">optional</span></button>
+        <div class="more" id="moreFields" hidden>
+          <div class="fgrid">
+            <p class="field" data-only="business">
+              <label for="f-company">Company <span class="opt">optional</span></label>
+              <input id="f-company" name="company" type="text" autocomplete="organization">
+            </p>
+            <p class="field">
+              <label for="f-email">Email <span class="opt">optional</span></label>
+              <input id="f-email" name="email" type="email" autocomplete="email">
+            </p>
+          </div>
+          <div class="fgrid">
+            <p class="field">
+              <label for="f-project">Type of job <span class="opt">optional</span></label>
+              <select id="f-project" name="project">
+                <option value="">Choose one…</option>
+                <option>New build</option>
+                <option>Remodel or tenant improvement</option>
+                <option>Roofing tear off</option>
+                <option>Demolition</option>
+                <option>Landscaping or excavation</option>
+                <option>Standing commercial rotation</option>
+                <option>Property turnover or cleanout</option>
+                <option>Other business job</option>
+              </select>
+            </p>
+            <p class="field">
+              <label for="f-date">Start date <span class="opt">optional</span></label>
+              <input id="f-date" name="date" type="date">
+            </p>
+          </div>
           <p class="field" data-only="business">
             <label for="f-standing">How often <span class="opt">optional</span></label>
             <select id="f-standing" name="standing">
@@ -339,12 +340,11 @@ End Google Tag Manager (noscript) -->
               <option>Standing rotation</option>
             </select>
           </p>
+          <p class="field">
+            <label for="f-notes">What's going in it? <span class="opt">optional</span></label>
+            <textarea id="f-notes" name="notes" rows="3" placeholder="Framing scrap, shingles, concrete, mixed demo. Helps us size it and quote the weight."></textarea>
+          </p>
         </div>
-
-        <p class="field">
-          <label for="f-notes">What's going in it? <span class="opt">optional</span></label>
-          <textarea id="f-notes" name="notes" rows="3" placeholder="Framing scrap, shingles, concrete, mixed demo. Helps us size it and quote the weight."></textarea>
-        </p>
 
         <label class="chk"><input type="checkbox" name="text_ok" value="yes"><span>Text me the quote and updates at this number. Message and data rates may apply. Reply STOP to end.</span></label>
         <label class="chk" hidden><input type="checkbox" name="offer_ok" value="yes"><span>Email me $50 off my first bin and the occasional contractor offer.</span></label>
@@ -985,7 +985,7 @@ End Google Tag Manager (noscript) -->
 }
 </script>
 
-<script src="main.js?v=20261004"></script>
-<script src="finder.js?v=20261004"></script>
+<script src="main.js?v=20261008"></script>
+<script src="finder.js?v=20261008"></script>
 </body>
 </html>

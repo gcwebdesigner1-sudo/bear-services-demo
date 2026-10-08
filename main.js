@@ -388,21 +388,19 @@
         date: val('date'), standing: val('standing'), notes: val('notes')
       };
 
+      // only what dispatch needs to call back is required; everything else is optional
+      var badEmail = !!f.email && !validEmail(f.email);
       var missing = [];
-      if (mode === 'business' && !f.company) { missing.push('your company'); }
       if (!f.name)    { missing.push('your name'); }
       if (!f.phone)   { missing.push('a phone number'); }
-      if (!validEmail(f.email)) { missing.push('a working email'); }
-      if (!f.project) { missing.push('the type of job'); }
       if (!f.where)   { missing.push('where the bin goes'); }
       if (!f.size)    { missing.push('a bin size'); }
+      if (badEmail)   { missing.push('a working email (or leave it blank)'); openMore(); }
 
-      flag(form.elements['company'], mode === 'business' && !f.company);
-      flag(form.elements['name'],    !f.name);
-      flag(form.elements['phone'],   !f.phone);
-      flag(form.elements['email'],   !validEmail(f.email));
-      flag(form.elements['project'], !f.project);
-      flag(form.elements['where'],   !f.where);
+      flag(form.elements['name'],  !f.name);
+      flag(form.elements['phone'], !f.phone);
+      flag(form.elements['where'], !f.where);
+      flag(form.elements['email'], badEmail);
       document.querySelector('.field--set').setAttribute('aria-invalid', f.size ? 'false' : 'true');
 
       if (missing.length) {
@@ -419,9 +417,9 @@
 
       var lines = [];
       if (mode === 'home') { f.company = ''; f.standing = ''; }
-      lines.push(mode === 'home' ? 'Customer: home project' : 'Company: ' + f.company);
-      lines.push('Contact: ' + f.name + ', ' + f.phone + ', ' + f.email);
-      lines.push('Job: ' + f.project + (f.standing ? ' (' + f.standing + ')' : ''));
+      lines.push(mode === 'home' ? 'Customer: home project' : 'Company: ' + (f.company || 'not given'));
+      lines.push('Contact: ' + f.name + ', ' + f.phone + (f.email ? ', ' + f.email : ''));
+      if (f.project || f.standing) { lines.push('Job: ' + (f.project || 'not given') + (f.standing ? ' (' + f.standing + ')' : '')); }
       lines.push('Bin: ' + f.size);
       lines.push('Where: ' + f.where);
       if (f.date)  { lines.push('Start: ' + prettyDate(f.date)); }
@@ -433,9 +431,9 @@
         // home requests say so up front so dispatch can tell them apart at a glance
         _subject: mode === 'home'
           ? 'Bear home quote request: ' + f.name + ' ' + f.phone + ', ' + f.size + ' at ' + f.where
-          : 'Bear quote request: ' + f.company + ', ' + f.name + ' ' + f.phone + ', ' + f.size + ' at ' + f.where,
+          : 'Bear quote request: ' + (f.company ? f.company + ', ' : '') + f.name + ' ' + f.phone + ', ' + f.size + ' at ' + f.where,
         _cc: LEAD_CC,
-        _replyto: f.email,
+        _replyto: f.email || undefined,
         customer: mode,
         company: f.company, name: f.name, phone: f.phone, email: f.email, project: f.project,
         where: f.where, size: f.size, start: f.date, standing: f.standing, notes: f.notes,
@@ -501,9 +499,27 @@
       out.hidden = true;
       form.hidden = false;
       form.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      form.elements[form.getAttribute('data-mode') === 'home' ? 'name' : 'company'].focus({ preventScroll: true });
+      form.elements['name'].focus({ preventScroll: true });
     });
   }
+
+  /* ── optional details live behind a link so the form starts at four fields ── */
+  function openMore() {
+    var box = document.getElementById('moreFields');
+    var b = document.querySelector('[data-more]');
+    if (box && box.hidden) { box.hidden = false; box.classList.add('in'); }
+    if (b) { b.setAttribute('aria-expanded', 'true'); }
+  }
+  document.addEventListener('click', function (ev) {
+    var b = ev.target.closest && ev.target.closest('[data-more]');
+    if (!b) { return; }
+    var box = document.getElementById(b.getAttribute('aria-controls'));
+    if (!box) { return; }
+    var opening = box.hidden;
+    box.hidden = !opening;
+    b.setAttribute('aria-expanded', opening ? 'true' : 'false');
+    if (opening) { track('form_more', {}); }
+  });
 
   /* ── bin card buttons and the bin finder hand a size to the quote form ── */
   function applyFinderPick(d) {
@@ -512,7 +528,7 @@
     var r = d.size && fm.querySelector('input[name="size"][value="' + d.size + '"]');
     if (r) { r.checked = true; }
     var notes = fm.elements['notes'];
-    if (notes && d.note && notes.value.indexOf('Bin finder:') < 0) { notes.value = d.note + (notes.value ? '\n' + notes.value : ''); }
+    if (notes && d.note && notes.value.indexOf('Bin finder:') < 0) { notes.value = d.note + (notes.value ? '\n' + notes.value : ''); openMore(); }
     if (d.material) { fm.setAttribute('data-finder-material', d.material); }
     fillFinderJob();
     var sec = document.getElementById('request');

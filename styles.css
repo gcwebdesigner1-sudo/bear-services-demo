@@ -873,3 +873,8 @@ html:has(.bf[open]){overflow:hidden}
 .bfnudge__x{position:absolute;top:6px;right:6px;width:34px;height:34px;border:0;background:none;border-radius:50%;cursor:pointer;font:500 20px/1 var(--f);color:var(--slate)}
 .bfnudge__x:hover{background:var(--soft);color:var(--ink)}
 @media(min-width:701px){.bfnudge{left:auto;right:24px;bottom:24px;width:360px}}
+
+/* short quote form: optional details behind a link */
+.more-toggle{display:inline-flex;align-items:baseline;gap:6px;margin:0 0 16px;font-size:14.5px}
+.more-toggle .opt{font-weight:500;text-decoration:none}
+.more[hidden]{display:none}
