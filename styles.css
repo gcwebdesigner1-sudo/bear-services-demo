@@ -878,3 +878,11 @@ html:has(.bf[open]){overflow:hidden}
 .more-toggle{display:inline-flex;align-items:baseline;gap:6px;margin:0 0 16px;font-size:14.5px}
 .more-toggle .opt{font-weight:500;text-decoration:none}
 .more[hidden]{display:none}
+
+/* permit guide comparison table (11/2/2026) */
+.prose .tbl{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 0 26px;border:1px solid var(--line);border-radius:12px}
+.prose table{width:100%;border-collapse:collapse;font-size:15px;line-height:1.5;color:var(--slate);min-width:600px}
+.prose th,.prose td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+.prose th{background:var(--soft);color:var(--ink);font-weight:700;font-size:14px}
+.prose tbody tr:last-child td{border-bottom:0}
+.prose td a[href^="tel:"]{white-space:nowrap}
