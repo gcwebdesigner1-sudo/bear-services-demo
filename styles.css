@@ -886,3 +886,8 @@ html:has(.bf[open]){overflow:hidden}
 .prose th{background:var(--soft);color:var(--ink);font-weight:700;font-size:14px}
 .prose tbody tr:last-child td{border-bottom:0}
 .prose td a[href^="tel:"]{white-space:nowrap}
+
+/* 15 vs 30 yard comparison table (11/10/2026) */
+.prose .tbl--cmp table{min-width:0}
+.prose .tbl--cmp caption{caption-side:top;text-align:left;padding:12px 12px 4px;font-weight:700;font-size:14px;color:var(--ink);letter-spacing:0;word-spacing:.12em}
+.prose .tbl--cmp tbody th{background:transparent;font-size:15px;width:26%}
